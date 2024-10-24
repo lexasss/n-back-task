@@ -1,6 +1,5 @@
 ﻿using NAudio.Wave;
 using System.IO;
-using System.Xml.Linq;
 
 namespace CttTest;
 
