@@ -274,16 +274,22 @@ public partial class MainWindow : Window
     {
         if (e.Key == Key.Enter)
         {
-            _procedure.Run(_setupIndex);
+            if (!_procedure.IsRunning)
+            {
+                _procedure.Run(_setupIndex);
+            }
         }
         else if (e.Key == Key.Escape)
         {
-            _procedure.Stop();
+            if (_procedure.IsRunning)
+            {
+                _procedure.Stop();
 
-            grdSetup.Visibility = Visibility.Hidden;
+                grdSetup.Visibility = Visibility.Hidden;
 
-            DisplayInfo("Interrupted");
-            DisplayInfo("Press ENTER to start", 2000);
+                DisplayInfo("Interrupted");
+                DisplayInfo("Press ENTER to start", 2000);
+            }
         }
         else if (e.Key >= Key.D1 && e.Key <= Key.D9)
         {
