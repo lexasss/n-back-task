@@ -78,6 +78,8 @@ internal class Setup
         return shuffledIndexes.ToArray();
     }
 
+    public override string ToString() => Name;
+
     // Internal
 
     protected List<Stimulus> _stimuli = [];

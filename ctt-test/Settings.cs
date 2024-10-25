@@ -13,6 +13,8 @@ internal class Settings : INotifyPropertyChanged
 {
     public static Settings Instance => _instance ??= new();
 
+    // Inter-session
+
     public SolidColorBrush ScreenColor { get; set; }
     public SolidColorBrush ActiveScreenColor { get; set; }
     public SolidColorBrush StimulusColor { get; set; }
@@ -29,9 +31,8 @@ internal class Settings : INotifyPropertyChanged
     public bool ActivationInterruptsTrial { get; set; }
     public bool AllowMultipleActivations { get; set; }
 
-    public int TrialCount { get; set; }
-
     public InputMode InputMode { get; set; }
+    public int TrialCount { get; set; }
 
     public string LogFolder
     {
@@ -42,6 +43,11 @@ internal class Settings : INotifyPropertyChanged
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LogFolder)));
         }
     }
+
+    // Session-only
+
+    public int SetupIndex { get; set; } = -1;
+
 
     public event EventHandler? Updated;
     public event PropertyChangedEventHandler? PropertyChanged;

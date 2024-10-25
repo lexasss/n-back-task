@@ -53,8 +53,6 @@ public partial class MainWindow : Window
 
     CancellationTokenSource _cts = new();
 
-    int _setupIndex = -1;
-
     private void DisplayInfo(string info, int delay = 0)
     {
         _cts.Cancel();
@@ -104,10 +102,10 @@ public partial class MainWindow : Window
 
     private void LoadSetup(int index)
     {
-        if (index < 0 || index >= _procedure.Setups.Length || index == _setupIndex)
+        if (index < 0 || index >= _procedure.Setups.Length || index == _settings.SetupIndex)
             return;
 
-        _setupIndex = index;
+        _settings.SetupIndex = index;
 
         var setup = _procedure.Setups[index];
 
@@ -299,7 +297,7 @@ public partial class MainWindow : Window
         {
             if (!_procedure.IsRunning)
             {
-                _procedure.Run(_setupIndex);
+                _procedure.Run(_settings.SetupIndex);
             }
         }
         else if (e.Key == Key.Escape)
@@ -337,7 +335,13 @@ public partial class MainWindow : Window
                 _settings.ShowDialog();
             }
         }
-
+        else if (e.Key == Key.F3)
+        {
+            if (!_procedure.IsRunning)
+            {
+                _procedure.ShowSetupEditor();
+            }
+        }
     }
 
     private void Window_Closed(object sender, EventArgs e)

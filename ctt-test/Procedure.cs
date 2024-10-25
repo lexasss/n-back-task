@@ -104,6 +104,15 @@ internal class Procedure
         _logger.Add("stimuli", "order", string.Join(' ', stimuli.Select(s => s.Text)));
     }
 
+    public void ShowSetupEditor()
+    {
+        var dialog = new SetupEditor(this);
+        if (dialog.ShowDialog() == true)
+        {
+
+        }
+    }
+
     // Internal
 
     enum State
