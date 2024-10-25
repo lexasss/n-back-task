@@ -29,16 +29,16 @@ internal class Logger
 
     public string? Save()
     {
-        if (string.IsNullOrEmpty(Settings.LogFolder))
+        if (string.IsNullOrEmpty(_settings.LogFolder))
         {
             var dialog = new Microsoft.Win32.OpenFolderDialog()
             {
-                DefaultDirectory = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ctt")
+                DefaultDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             };
 
-            if (dialog.ShowDialog() ?? false)
+            if (dialog.ShowDialog() == true)
             {
-                Settings.LogFolder = dialog.FolderName;
+                _settings.LogFolder = dialog.FolderName;
             }
             else
             {
@@ -46,7 +46,7 @@ internal class Logger
             }
         }
 
-        var filename = Path.Join(Settings.LogFolder, $"ctt-test-{DateTime.Now:u}.txt".ToPath());
+        var filename = Path.Join(_settings.LogFolder, $"ctt-test-{DateTime.Now:u}.txt".ToPath());
 
         try
         {
@@ -79,6 +79,7 @@ internal class Logger
     static Logger? _instance = null;
 
     readonly List<string> _records = [];
+    readonly Settings _settings = Settings.Instance;
 
     long _startTime = DateTime.Now.Ticks;
 }

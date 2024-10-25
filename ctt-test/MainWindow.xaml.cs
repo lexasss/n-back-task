@@ -11,9 +11,28 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        Background = Settings.ScreenColor;
+        Background = _settings.ScreenColor;
+        grdSetup.Background = _settings.ActiveScreenColor;
 
-        grdSetup.Background = Settings.ActiveScreenColor;
+        _settings.Updated += (s, e) =>
+        {
+            Background = _settings.ScreenColor;
+            grdSetup.Background = _settings.ActiveScreenColor;
+
+            foreach (Border el in _stimuliElements)
+            {
+                el.BorderBrush = _settings.StimulusFontColor;
+                el.BorderThickness = new Thickness(_settings.StimulusBorderThickness);
+                el.Margin = new Thickness(_settings.StimulusGap / 2);
+                
+                if (el.Child is Label label)
+                {
+                    label.Background = _settings.StimulusColor;
+                    label.Foreground = _settings.StimulusFontColor;
+                }
+            }
+        };
+
         grdSetup.Visibility = Visibility.Hidden;
 
         _procedure.NextTask += Procedure_NextTask;
@@ -28,6 +47,7 @@ public partial class MainWindow : Window
 
     readonly Procedure _procedure = new();
     readonly Random _random = new();
+    readonly Settings _settings = Settings.Instance;
 
     readonly List<UIElement> _stimuliElements = [];
 
@@ -114,9 +134,9 @@ public partial class MainWindow : Window
 
             var border = new Border()
             {
-                BorderBrush = Settings.StimulusFontColor,
-                BorderThickness = new Thickness(Settings.StimulusBorderThickness),
-                Margin = new Thickness(Settings.StimulusGap / 2)
+                BorderBrush = _settings.StimulusFontColor,
+                BorderThickness = new Thickness(_settings.StimulusBorderThickness),
+                Margin = new Thickness(_settings.StimulusGap / 2)
             };
 
             var label = new Label()
@@ -136,8 +156,8 @@ public partial class MainWindow : Window
                 label.Height = stimulus.Size;
             }
 
-            label.Background = Settings.StimulusColor;
-            label.Foreground = Settings.StimulusFontColor;
+            label.Background = _settings.StimulusColor;
+            label.Foreground = _settings.StimulusFontColor;
 
             label.TouchDown += Stimulus_TouchDown;
             label.TouchUp += Stimulus_TouchUp;
@@ -176,11 +196,14 @@ public partial class MainWindow : Window
         });
     }
 
-    private void Procedure_StimuliHidden(object? sender, bool isCorrect)
+    private void Procedure_StimuliHidden(object? sender, bool? isCorrect)
     {
         Dispatcher.Invoke(() =>
         {
-            DisplayInfo(isCorrect ? "Success" : "Failed");
+            if (isCorrect != null && _settings.InfoDuration > 0)
+            {
+                DisplayInfo(isCorrect == true ? "Success" : "Failed");
+            }
             grdSetup.Visibility = Visibility.Hidden;
 
             foreach (Border el in _stimuliElements)
@@ -188,8 +211,8 @@ public partial class MainWindow : Window
                 var label = el.Child as Label;
                 if (label != null)
                 {
-                    label.Background = Settings.StimulusColor;
-                    label.Foreground = Settings.StimulusFontColor;
+                    label.Background = _settings.StimulusColor;
+                    label.Foreground = _settings.StimulusFontColor;
                 }
             }
         });
@@ -199,6 +222,8 @@ public partial class MainWindow : Window
     {
         Dispatcher.Invoke(() =>
         {
+            grdSetup.Visibility = Visibility.Hidden;
+
             DisplayInfo("Finished!");
             DisplayInfo("Press ENTER to start", 2000);
         });
@@ -208,64 +233,62 @@ public partial class MainWindow : Window
 
     private void Stimulus_MouseDown(object sender, MouseButtonEventArgs e)
     {
+        if (_settings.InputMode != InputMode.Mouse)
+            return;
+
         if (sender is not Label lbl)
             return;
 
         Stimulus? stimulus = lbl.Tag as Stimulus;
 
-        if (_procedure.CanActivateStimulus(stimulus))
+        if (_procedure.ActivateStimulus(stimulus))
         {
-            lbl.Background = Settings.ActiveStimulusColor;
-            lbl.Foreground = Settings.ActiveStimulusFontColor;
+            lbl.Background = _settings.ActiveStimulusColor;
+            lbl.Foreground = _settings.ActiveStimulusFontColor;
         }
-
-        lbl.CaptureMouse();
     }
 
     private void Stimulus_MouseUp(object sender, MouseButtonEventArgs e)
     {
+        if (_settings.InputMode != InputMode.Mouse)
+            return;
+
         if (sender is not Label lbl)
             return;
 
-        lbl.Background = Settings.StimulusColor;
-        lbl.Foreground = Settings.StimulusFontColor;
-
-        if (lbl.IsMouseCaptured)
-        {
-            ReleaseMouseCapture();
-        }
+        lbl.Background = _settings.StimulusColor;
+        lbl.Foreground = _settings.StimulusFontColor;
 
         _procedure.DeactivateStimulus();
     }
 
     private void Stimulus_TouchDown(object? sender, TouchEventArgs e)
     {
+        if (_settings.InputMode != InputMode.Touch)
+            return;
+
         if (sender is not Label lbl)
             return;
 
         Stimulus? stimulus = lbl.Tag as Stimulus;
 
-        if (_procedure.CanActivateStimulus(stimulus))
+        if (_procedure.ActivateStimulus(stimulus))
         {
-            lbl.Background = Settings.ActiveStimulusColor;
-            lbl.Foreground = Settings.ActiveStimulusFontColor;
+            lbl.Background = _settings.ActiveStimulusColor;
+            lbl.Foreground = _settings.ActiveStimulusFontColor;
         }
-
-        e.TouchDevice.Capture(lbl);
     }
 
     private void Stimulus_TouchUp(object? sender, TouchEventArgs e)
     {
+        if (_settings.InputMode != InputMode.Touch)
+            return;
+
         if (sender is not Label lbl)
             return;
 
-        lbl.Background = Settings.StimulusColor;
-        lbl.Foreground = Settings.StimulusFontColor;
-
-        if (e.TouchDevice.Captured == lbl)
-        {
-            lbl.ReleaseTouchCapture(e.TouchDevice);
-        }
+        lbl.Background = _settings.StimulusColor;
+        lbl.Foreground = _settings.StimulusFontColor;
 
         _procedure.DeactivateStimulus();
     }
@@ -307,5 +330,18 @@ public partial class MainWindow : Window
                 LoadSetup(setupIndex);
             }
         }
+        else if (e.Key == Key.F2)
+        {
+            if (!_procedure.IsRunning)
+            {
+                _settings.ShowDialog();
+            }
+        }
+
+    }
+
+    private void Window_Closed(object sender, EventArgs e)
+    {
+        _settings.Save();
     }
 }

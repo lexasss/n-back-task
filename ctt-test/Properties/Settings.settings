@@ -15,10 +15,10 @@
       <Value Profile="(Default)">White</Value>
     </Setting>
     <Setting Name="ActiveStimulusColor" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Yellow</Value>
+      <Value Profile="(Default)">Black</Value>
     </Setting>
     <Setting Name="ActiveStimulusFontColor" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Black</Value>
+      <Value Profile="(Default)">Grey</Value>
     </Setting>
     <Setting Name="StimulusBorderThickness" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">3</Value>
@@ -40,6 +40,15 @@
     </Setting>
     <Setting Name="LogFolder" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ActivationInterruptsTrial" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AllowMultipleActivations" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="InputMode" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

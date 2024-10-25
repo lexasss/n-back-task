@@ -11,7 +11,7 @@ internal class Procedure
 
     public event EventHandler<Setup>? NextTask;
     public event EventHandler? StimuliShown;
-    public event EventHandler<bool>? StimuliHidden;
+    public event EventHandler<bool?>? StimuliHidden;
     public event EventHandler? Finished;
 
     public Procedure()
@@ -27,6 +27,14 @@ internal class Procedure
         audioFiIlename.Add(SOUND_INCORRECT);
 
         _player.CheckSoundsExist(audioFiIlename.ToArray());
+
+        _settings.Updated += (s, e) =>
+        {
+            foreach (var setup in Setups)
+            {
+                setup.TrialCount = _settings.TrialCount;
+            }
+        };
     }
 
     public void Run(int setupIndex)
@@ -59,23 +67,36 @@ internal class Procedure
         UpdateState(State.Inactive);
     }
 
-    public bool CanActivateStimulus(Stimulus? stimulus)
+    public bool ActivateStimulus(Stimulus? stimulus)
     {
-        var canActivate = CurrentSetup?.GetActiveStimulus() is null;
+        bool wasActivated = true;
 
-        if (canActivate && stimulus != null)
+        if (_settings.AllowMultipleActivations)
+        {
+            CurrentSetup?.ResetStimuli();
+        }
+        else
+        {
+            wasActivated = CurrentSetup?.GetActiveStimulus() is null;
+        }
+
+        if (wasActivated && stimulus != null)
         {
             stimulus.WasActivated = true;
             _logger.Add("stimulus", "activated", stimulus.Text);
+            System.Diagnostics.Debug.WriteLine($"Activated: {stimulus.Text}");
         }
 
-        return canActivate;
+        return wasActivated;
     }
 
     public void DeactivateStimulus()
     {
-        _timer.Stop();
-        UpdateState(State.Info);
+        if (_settings.ActivationInterruptsTrial)
+        {
+            _timer.Stop();
+            UpdateState(State.Info);
+        }
     }
 
     public void LogStimuliOrder(Stimulus[] stimuli)
@@ -99,6 +120,7 @@ internal class Procedure
     readonly System.Timers.Timer _timer = new();
     readonly Player _player = new();
     readonly Logger _logger = Logger.Instance;
+    readonly Settings _settings = Settings.Instance;
 
     State _state = State.Inactive;
     int[] _targetIndexes = [];
@@ -111,7 +133,7 @@ internal class Procedure
 
         CurrentSetup.ResetStimuli();
 
-        if (++_taskIndex < CurrentSetup.TaskCount)
+        if (++_taskIndex < CurrentSetup.TrialCount)
         {
             UpdateState(State.BlankScreen);
         }
@@ -137,17 +159,20 @@ internal class Procedure
 
         if (_state == State.BlankScreen)
         {
-            _timer.Interval = Settings.BlankScreenDuration;
+            _timer.Interval = Math.Max(1, _settings.BlankScreenDuration);
             _timer.Start();
 
             _logger.Add("stimuli", "target", CurrentSetup.Stimuli[_targetIndexes[_taskIndex]]?.Text ?? "?");
 
+            if (_settings.InfoDuration == 0 && _settings.BlankScreenDuration > 0)
+            {
+                StimuliHidden?.Invoke(this, null);
+            }
             NextTask?.Invoke(this, CurrentSetup);
-
         }
         else if (_state == State.Stimuli)
         {
-            _timer.Interval = Settings.StimulusDuration;
+            _timer.Interval = _settings.StimulusDuration;
             _timer.Start();
 
             StimuliShown?.Invoke(this, EventArgs.Empty);
@@ -165,7 +190,7 @@ internal class Procedure
         }
         else if (_state == State.Info)
         {
-            _timer.Interval = Settings.InfoDuration;
+            _timer.Interval = Math.Max(1, _settings.InfoDuration);
             _timer.Start();
 
             var stimulus = CurrentSetup.Stimuli[_targetIndexes[_taskIndex]];
@@ -174,11 +199,11 @@ internal class Procedure
             _logger.Add("stimuli", "hidden");
             _logger.Add("experiment", "result", isCorrect ? "success" : "failure");
 
-            StimuliHidden?.Invoke(this, isCorrect);
-
-            _player.Play(isCorrect ? SOUND_CORRECT : SOUND_INCORRECT);
-
-            System.Diagnostics.Debug.WriteLine($"Is correct: {isCorrect}");
+            if (_settings.InfoDuration > 0)
+            {
+                StimuliHidden?.Invoke(this, isCorrect);
+                _player.Play(isCorrect ? SOUND_CORRECT : SOUND_INCORRECT);
+            }
         }
         else if (_state == State.Inactive)
         {

@@ -1,0 +1,170 @@
+﻿<Window x:Class="CttTest.SettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:CttTest"
+        mc:Ignorable="d"
+        Title="Settings"
+        Height="620"
+        Width="240"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Icon="/icon.png">
+    
+    <Window.Resources>
+        <local:ColorBrushConverter x:Key="scb2brush"/>
+        <local:NegateConverter x:Key="not"/>
+
+        <ObjectDataProvider x:Key="inputModes" MethodName="GetValues"
+                            ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:InputMode"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        
+        <Style TargetType="Button">
+            <Setter Property="MinWidth" Value="60"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
+        <Style x:Key="Iconic" TargetType="Button">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28 "/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="Color" TargetType="Button">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="Padding" Value="3"/>
+            <Setter Property="Width" Value="46"/>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="4,0"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="4,2,0,2"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <StackPanel Margin="4">
+            <Grid>
+                <Label>Screen background</Label>
+                <Button x:Name="btnScreenColor" Style="{StaticResource Color}" Click="Color_Click">
+                    <Rectangle Fill="{Binding ScreenColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
+                </Button>
+            </Grid>
+            <Grid>
+                <Label>Panel background</Label>
+                <Button x:Name="btnActiveScreenColor" Style="{StaticResource Color}" Click="Color_Click">
+                    <Rectangle Fill="{Binding ActiveScreenColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
+                </Button>
+            </Grid>
+            <Grid>
+                <Label>stimulus background</Label>
+                <Button x:Name="btnStimulusColor" Style="{StaticResource Color}" Click="Color_Click">
+                    <Rectangle Fill="{Binding StimulusColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
+                </Button>
+            </Grid>
+            <Grid>
+                <Label>stimulus foreground</Label>
+                <Button x:Name="btnStimulusFontColor" Style="{StaticResource Color}" Click="Color_Click">
+                    <Rectangle Fill="{Binding StimulusFontColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
+                </Button>
+            </Grid>
+            <Grid>
+                <Label>Selected stimulus background</Label>
+                <Button x:Name="btnActiveStimulusColor" Style="{StaticResource Color}" Click="Color_Click">
+                    <Rectangle Fill="{Binding ActiveStimulusColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
+                </Button>
+            </Grid>
+            <Grid>
+                <Label>Selected stimulus foreground</Label>
+                <Button x:Name="btnActiveStimulusFontColor" Style="{StaticResource Color}" Click="Color_Click">
+                    <Rectangle Fill="{Binding ActiveStimulusFontColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
+                </Button>
+            </Grid>
+
+            <Separator/>
+
+            <Grid>
+                <Label>Stimulus border, px</Label>
+                <TextBox Text="{Binding StimulusBorderThickness, Mode=TwoWay}"/>
+            </Grid>
+            <Grid>
+                <Label>Inter-stimulus gap, px</Label>
+                <TextBox Text="{Binding StimulusGap, Mode=TwoWay}"/>
+            </Grid>
+
+            <Separator/>
+
+            <Grid>
+                <Label>Blank screen duration, ms</Label>
+                <TextBox Text="{Binding BlankScreenDuration, Mode=TwoWay}"/>
+            </Grid>
+            <Grid>
+                <Label>Stimulus duration, ms</Label>
+                <TextBox Text="{Binding StimulusDuration, Mode=TwoWay}"/>
+            </Grid>
+            <CheckBox x:Name="chkActivationInterruptsTrial"
+                      Content="Activation interrupts trial"
+                      IsChecked="{Binding ActivationInterruptsTrial, Mode=TwoWay}"/>
+            <CheckBox Content="Allow multiple activations"
+                      IsChecked="{Binding AllowMultipleActivations, Mode=TwoWay}"
+                      IsEnabled="{Binding IsChecked, ElementName=chkActivationInterruptsTrial, Converter={StaticResource not}}"/>
+            <Grid>
+                <Label>Result display duration, ms</Label>
+                <TextBox Text="{Binding InfoDuration, Mode=TwoWay}"/>
+            </Grid>
+
+            <Separator/>
+
+            <StackPanel>
+                <Label>Input mode</Label>
+                <ComboBox ItemsSource="{Binding Source={StaticResource inputModes}}"
+                          SelectedItem="{Binding Path=InputMode}"/>
+            </StackPanel>
+            <Grid>
+                <Label>Number of trials</Label>
+                <TextBox Text="{Binding TrialCount, Mode=TwoWay}"/>
+            </Grid>
+
+            <StackPanel>
+                <Label>Log folder</Label>
+                <Grid Margin="4,0">
+                    <TextBlock Text="{Binding LogFolder, Mode=OneWay}"
+                               Margin="0,0,36,0"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center"/>
+                    <Button Style="{StaticResource Iconic}"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Content="..."
+                            Click="SelectFolder_Click"/>
+                </Grid>
+            </StackPanel>
+        </StackPanel>
+
+        <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
+            <Button Content="Save" Click="Save_Click"/>
+            <Button Content="Cancel" Click="Cancel_Click"/>
+        </WrapPanel>
+    </Grid>
+</Window>

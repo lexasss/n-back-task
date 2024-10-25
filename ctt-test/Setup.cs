@@ -13,9 +13,10 @@ internal class Setup
     public string Name { get; }
     public int RowCount { get; }
     public int ColumnCount { get; }
-    public int TaskCount { get; }
     public StimuliOrder StimuliOrder { get; }
     public HorizontalAlignment Alignment { get; }
+
+    public int TrialCount { get; set; }
 
     public Stimulus[] Stimuli => _stimuli.ToArray();
 
@@ -27,7 +28,7 @@ internal class Setup
         Name = name;
         RowCount = rowCount;
         ColumnCount = columnColumn;
-        TaskCount = taskCount;
+        TrialCount = taskCount;
         StimuliOrder = order;
         Alignment = alignment;
 
@@ -64,12 +65,12 @@ internal class Setup
     public int[] PrepareTargets()
     {
         List<int> indexes = [];
-        while (indexes.Count < TaskCount)
+        while (indexes.Count < TrialCount)
         {
             indexes.AddRange(_stimuli.Select((btn, i) => i));
         }
 
-        indexes.RemoveRange(TaskCount, indexes.Count - TaskCount);
+        indexes.RemoveRange(TrialCount, indexes.Count - TrialCount);
 
         Span<int> shuffledIndexes = indexes.ToArray();
         _random.Shuffle(shuffledIndexes);
@@ -86,25 +87,25 @@ internal class Setup
 
 internal class SetupVeryEasy : Setup
 {
-    public SetupVeryEasy() : base("Very Easy", 1, 2, HorizontalAlignment.Stretch, StimuliOrder.Ordered, Settings.TestCount) { }
+    public SetupVeryEasy() : base("Very Easy", 1, 2, HorizontalAlignment.Stretch, StimuliOrder.Ordered, Settings.Instance.TrialCount) { }
 }
 
 internal class SetupEasy : Setup
 {
-    public SetupEasy() : base("Easy", 2, 2, HorizontalAlignment.Stretch, StimuliOrder.Ordered, Settings.TestCount) { }
+    public SetupEasy() : base("Easy", 2, 2, HorizontalAlignment.Stretch, StimuliOrder.Ordered, Settings.Instance.TrialCount) { }
 }
 
 internal class SetupModerate : Setup
 {
-    public SetupModerate() : base("Moderate", 2, 5, HorizontalAlignment.Stretch, StimuliOrder.Ordered, Settings.TestCount) { }
+    public SetupModerate() : base("Moderate", 2, 5, HorizontalAlignment.Stretch, StimuliOrder.Ordered, Settings.Instance.TrialCount) { }
 }
 
 internal class SetupHard : Setup
 {
-    public SetupHard() : base("Hard", 2, 2, HorizontalAlignment.Stretch, StimuliOrder.Randomized, Settings.TestCount) { }
+    public SetupHard() : base("Hard", 2, 2, HorizontalAlignment.Stretch, StimuliOrder.Randomized, Settings.Instance.TrialCount) { }
 }
 
 internal class SetupVeryHard : Setup
 {
-    public SetupVeryHard() : base("Very Hard", 2, 5, HorizontalAlignment.Stretch, StimuliOrder.Randomized, Settings.TestCount) { }
+    public SetupVeryHard() : base("Very Hard", 2, 5, HorizontalAlignment.Stretch, StimuliOrder.Randomized, Settings.Instance.TrialCount) { }
 }

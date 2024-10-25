@@ -73,7 +73,7 @@ namespace CttTest.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Yellow")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Black")]
         public string ActiveStimulusColor {
             get {
                 return ((string)(this["ActiveStimulusColor"]));
@@ -85,7 +85,7 @@ namespace CttTest.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Black")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Grey")]
         public string ActiveStimulusFontColor {
             get {
                 return ((string)(this["ActiveStimulusFontColor"]));
@@ -176,6 +176,42 @@ namespace CttTest.Properties {
             }
             set {
                 this["LogFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ActivationInterruptsTrial {
+            get {
+                return ((bool)(this["ActivationInterruptsTrial"]));
+            }
+            set {
+                this["ActivationInterruptsTrial"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AllowMultipleActivations {
+            get {
+                return ((bool)(this["AllowMultipleActivations"]));
+            }
+            set {
+                this["AllowMultipleActivations"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int InputMode {
+            get {
+                return ((int)(this["InputMode"]));
+            }
+            set {
+                this["InputMode"] = value;
             }
         }
     }

@@ -8,7 +8,10 @@
         Title="CTT test"
         PreviewKeyUp="Window_KeyUp"
         Height="450"
-        Width="800">
+        Width="800"
+        Closed="Window_Closed"
+        Icon="/icon.png">
+    
     <Grid x:Name="grdContainer">
         <Label x:Name="lblInfo"
                FontSize="42"
