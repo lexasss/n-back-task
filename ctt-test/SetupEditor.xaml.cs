@@ -1,10 +1,14 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 
 namespace CttTest;
 
-public partial class SetupEditor : Window
+public partial class SetupEditor : Window, INotifyPropertyChanged
 {
-    public IEnumerable<string> Setups => _procedure.Setups.Select(setup => setup.Name);
+    public IEnumerable<string> SetupNames { get; }
+    public SetupData SetupData => _setups[_selectedSetupIndex];
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public int SelectedSetupIndex
     {
@@ -12,28 +16,25 @@ public partial class SetupEditor : Window
         set
         {
             _selectedSetupIndex = value;
-            LoadSetup(_selectedSetupIndex);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SetupData)));
         }
     }
 
-    internal SetupEditor(Procedure procedure)
+    internal SetupEditor(SetupData[] setups)
     {
         InitializeComponent();
 
-        _procedure = procedure;
+        _setups = setups;
+        SetupNames = setups.Select(setup => setup.Name);
+
         DataContext = this;
     }
 
     // Internal
 
-    readonly Procedure _procedure;
+    readonly SetupData[] _setups;
 
     int _selectedSetupIndex = 0;
-
-    private void LoadSetup(int index)
-    {
-        var setup = _procedure.Setups[index];
-    }
 
     // UI
 
@@ -45,5 +46,13 @@ public partial class SetupEditor : Window
     private void Cancel_Click(object sender, RoutedEventArgs e)
     {
         DialogResult = false;
+    }
+
+    private void Window_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Escape)
+        {
+            DialogResult = false;
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace CttTest;
 
-internal class Stimulus(string text, int size = 152, string? audioInstruction = null)
+public class Stimulus(string text, int size = 152, string? audioInstruction = null)
 {
     public string Text { get; } = text;
     public string AudioInstruction { get; } = audioInstruction ?? text;

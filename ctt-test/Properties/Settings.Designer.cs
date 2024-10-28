@@ -214,5 +214,17 @@ namespace CttTest.Properties {
                 this["InputMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Setups {
+            get {
+                return ((string)(this["Setups"]));
+            }
+            set {
+                this["Setups"] = value;
+            }
+        }
     }
 }

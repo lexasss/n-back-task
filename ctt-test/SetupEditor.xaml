@@ -3,28 +3,73 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:SystemWindows="clr-namespace:System.Windows;assembly=PresentationFramework"
         xmlns:local="clr-namespace:CttTest"
         mc:Ignorable="d"
         Title="Setup Editor"
-        Height="450"
-        Width="300"
+        Height="250"
+        Width="220"
         Icon="/icon.png"
         ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" PreviewKeyUp="Window_PreviewKeyUp">
 
     <Window.Resources>
+        <ObjectDataProvider x:Key="stimuliOrder" MethodName="GetValues"
+                            ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:StimuliOrder"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        
+        <ObjectDataProvider x:Key="horizontalAlignment" MethodName="GetValues"
+                            ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="SystemWindows:HorizontalAlignment"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
         <Style TargetType="Button">
             <Setter Property="MinWidth" Value="60"/>
             <Setter Property="Margin" Value="4"/>
             <Setter Property="Padding" Value="4"/>
         </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
     </Window.Resources>
     
-    <Grid>
+    <Grid Margin="4">
         <StackPanel>
             <Label>Setup</Label>
-            <ComboBox ItemsSource="{Binding Setups}"
+            <ComboBox ItemsSource="{Binding SetupNames}"
                       SelectedIndex="{Binding SelectedSetupIndex, Mode=TwoWay}"/>
+            <StackPanel Margin="0,4">
+                <Grid>
+                    <Label>Row count</Label>
+                    <TextBox Text="{Binding Path=SetupData.RowCount, Mode=TwoWay}"/>
+                </Grid>
+                <Grid>
+                    <Label>Column count</Label>
+                    <TextBox Text="{Binding Path=SetupData.ColumnCount, Mode=TwoWay}"/>
+                </Grid>
+                <Grid>
+                    <Label>Stimuli order</Label>
+                    <ComboBox Width="100"
+                              HorizontalAlignment="Right"
+                              ItemsSource="{Binding Source={StaticResource stimuliOrder}}"
+                              SelectedItem="{Binding SetupData.StimuliOrder, Mode=TwoWay}"/>
+                </Grid>
+                <Grid>
+                    <Label>Alignment</Label>
+                    <ComboBox Width="100"
+                              HorizontalAlignment="Right"
+                              ItemsSource="{Binding Source={StaticResource horizontalAlignment}}"
+                              SelectedItem="{Binding SetupData.Alignment, Mode=TwoWay}"/>
+                </Grid>
+            </StackPanel>
         </StackPanel>
 
         <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">

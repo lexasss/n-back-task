@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Text.Json;
+using System.Windows;
 
 namespace CttTest;
 
@@ -34,6 +35,15 @@ internal class Procedure
             {
                 setup.TrialCount = _settings.TrialCount;
             }
+        };
+
+        Application.Current.Exit += (s, e) =>
+        {
+            var setups = Setups.Select(SetupData.From).ToArray();
+            var setupString = JsonSerializer.Serialize(setups);
+
+            Properties.Settings.Default.Setups = setupString;
+            Properties.Settings.Default.Save();
         };
     }
 
@@ -106,10 +116,14 @@ internal class Procedure
 
     public void ShowSetupEditor()
     {
-        var dialog = new SetupEditor(this);
+        var setups = Setups.Select(SetupData.From).ToArray();
+        var dialog = new SetupEditor(setups);
         if (dialog.ShowDialog() == true)
         {
-
+            for (int i = 0; i < Setups.Length; i++)
+            {
+                Setups[i] = new Setup(setups[i]);
+            }
         }
     }
 
