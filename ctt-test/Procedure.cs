@@ -10,7 +10,7 @@ internal class Procedure
 
     public bool IsRunning => _state != State.Inactive;
 
-    public event EventHandler<Setup>? NextTask;
+    public event EventHandler<Setup>? NextTrial;
     public event EventHandler? StimuliShown;
     public event EventHandler<bool?>? StimuliHidden;
     public event EventHandler? Finished;
@@ -62,7 +62,7 @@ internal class Procedure
 
         _targetIndexes = CurrentSetup.PrepareTargets();
 
-        _taskIndex = -1;
+        _trialIndex = -1;
 
         Next();
     }
@@ -147,7 +147,7 @@ internal class Procedure
 
     State _state = State.Inactive;
     int[] _targetIndexes = [];
-    int _taskIndex = -1;
+    int _trialIndex = -1;
 
     private void Next()
     {
@@ -156,7 +156,7 @@ internal class Procedure
 
         CurrentSetup.ResetStimuli();
 
-        if (++_taskIndex < CurrentSetup.TrialCount)
+        if (++_trialIndex < CurrentSetup.TrialCount)
         {
             UpdateState(State.BlankScreen);
         }
@@ -185,13 +185,13 @@ internal class Procedure
             _timer.Interval = Math.Max(1, _settings.BlankScreenDuration);
             _timer.Start();
 
-            _logger.Add("stimuli", "target", CurrentSetup.Stimuli[_targetIndexes[_taskIndex]]?.Text ?? "?");
+            _logger.Add("stimuli", "target", CurrentSetup.Stimuli[_targetIndexes[_trialIndex]]?.Text ?? "?");
 
             if (_settings.InfoDuration == 0 && _settings.BlankScreenDuration > 0)
             {
                 StimuliHidden?.Invoke(this, null);
             }
-            NextTask?.Invoke(this, CurrentSetup);
+            NextTrial?.Invoke(this, CurrentSetup);
         }
         else if (_state == State.Stimuli)
         {
@@ -202,21 +202,21 @@ internal class Procedure
 
             _logger.Add("stimuli", "displayed");
 
-            var stimulus = CurrentSetup.Stimuli[_targetIndexes[_taskIndex]];
+            var stimulus = CurrentSetup.Stimuli[_targetIndexes[_trialIndex]];
             var sound = stimulus?.AudioInstruction;
             if (sound != null)
             {
                 _player.Play(sound);
             }
 
-            System.Diagnostics.Debug.WriteLine($"Task stimulus: {CurrentSetup.Stimuli[_targetIndexes[_taskIndex]].Text}");
+            System.Diagnostics.Debug.WriteLine($"Trial stimulus: {CurrentSetup.Stimuli[_targetIndexes[_trialIndex]].Text}");
         }
         else if (_state == State.Info)
         {
             _timer.Interval = Math.Max(1, _settings.InfoDuration);
             _timer.Start();
 
-            var stimulus = CurrentSetup.Stimuli[_targetIndexes[_taskIndex]];
+            var stimulus = CurrentSetup.Stimuli[_targetIndexes[_trialIndex]];
 
             bool isCorrect = stimulus?.WasActivated ?? false;
             _logger.Add("stimuli", "hidden");

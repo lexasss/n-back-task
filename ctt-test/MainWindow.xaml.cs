@@ -35,7 +35,7 @@ public partial class MainWindow : Window
 
         grdSetup.Visibility = Visibility.Hidden;
 
-        _procedure.NextTask += Procedure_NextTask;
+        _procedure.NextTrial += Procedure_NextTrial;
         _procedure.StimuliShown += Procedure_StimuliShown;
         _procedure.StimuliHidden += Procedure_StimuliHidden;
         _procedure.Finished += Procedure_Finished;
@@ -173,7 +173,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void Procedure_NextTask(object? sender, Setup setup)
+    private void Procedure_NextTrial(object? sender, Setup setup)
     {
         Dispatcher.Invoke(() =>
         {

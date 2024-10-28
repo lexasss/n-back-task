@@ -13,6 +13,15 @@
         Icon="/icon.png">
     
     <Grid x:Name="grdContainer">
+        <TextBlock x:Name="tblInstructions"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top">
+            <Run>F2 - Settings</Run>
+            <LineBreak/>
+            <Run>F3 - Setup editor</Run>
+            <LineBreak/>
+            <Run>1..5 - Choose the setup</Run>
+        </TextBlock>
         <Label x:Name="lblInfo"
                FontSize="42"
                HorizontalAlignment="Center"

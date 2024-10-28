@@ -54,4 +54,12 @@ public partial class SettingsDialog : Window
             _settings.LogFolder = dialog.FolderName;
         }
     }
+
+    private void Window_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Escape)
+        {
+            DialogResult = false;
+        }
+    }
 }
