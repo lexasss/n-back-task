@@ -10,7 +10,7 @@
         Height="450"
         Width="800"
         Closed="Window_Closed"
-        Icon="/icon.png">
+        Icon="/assets/images/icon.png">
     
     <Grid x:Name="grdContainer">
         <TextBlock x:Name="tblInstructions"

@@ -9,7 +9,7 @@
         Title="Settings"
         Height="362"
         Width="480"
-        Icon="/icon.png"
+        Icon="/assets/images/icon.png"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
     
