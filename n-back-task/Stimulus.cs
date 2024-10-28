@@ -1,4 +1,4 @@
-﻿namespace CttTest;
+﻿namespace NBackTask;
 
 public class Stimulus(string text, int size = 152, string? audioInstruction = null)
 {

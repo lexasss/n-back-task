@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Windows;
 
-namespace CttTest;
+namespace NBackTask;
 
 internal class Procedure
 {
@@ -168,7 +168,7 @@ internal class Procedure
             var filename = _logger.Save();
             if (filename != null)
             {
-                MessageBox.Show($"Data saved to '{filename}'", "CTT test", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Data saved to '{filename}'", "N-Back task", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows.Media;
 
-namespace CttTest;
+namespace NBackTask;
 
 internal enum InputMode
 {

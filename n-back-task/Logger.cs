@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Windows.Forms;
 
-namespace CttTest;
+namespace NBackTask;
 
 internal class Logger
 {
@@ -46,7 +46,7 @@ internal class Logger
             }
         }
 
-        var filename = Path.Join(_settings.LogFolder, $"ctt-test-{DateTime.Now:u}.txt".ToPath());
+        var filename = Path.Join(_settings.LogFolder, $"n-back-task-{DateTime.Now:u}.txt".ToPath());
 
         try
         {
@@ -66,7 +66,7 @@ internal class Logger
         {
             System.Diagnostics.Debug.WriteLine(ex.Message);
             filename = null;
-            MessageBox.Show($"Cannot save data into '{filename}:\n{ex.Message}'", "CTT test", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Cannot save data into '{filename}:\n{ex.Message}'", "N-Back task", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         return filename;

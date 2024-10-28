@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media;
 
-namespace CttTest;
+namespace NBackTask;
 
 internal static class StringExt
 {

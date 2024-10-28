@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace CttTest;
+namespace NBackTask;
 
 public partial class App : Application
 {

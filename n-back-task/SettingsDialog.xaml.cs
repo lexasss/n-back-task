@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace CttTest;
+namespace NBackTask;
 
 public partial class SettingsDialog : Window
 {

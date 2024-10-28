@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 
-namespace CttTest;
+namespace NBackTask;
 
 public partial class SetupEditor : Window, INotifyPropertyChanged
 {

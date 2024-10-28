@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Windows;
 
-namespace CttTest;
+namespace NBackTask;
 
 public enum StimuliOrder
 {

@@ -1,7 +1,7 @@
 ﻿using NAudio.Wave;
 using System.IO;
 
-namespace CttTest;
+namespace NBackTask;
 
 /// <summary>
 /// Plays an MP3 resource file

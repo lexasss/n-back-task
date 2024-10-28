@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CttTest.Properties {
+namespace NBackTask.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

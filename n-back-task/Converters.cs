@@ -2,7 +2,7 @@
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace CttTest;
+namespace NBackTask;
 
 [ValueConversion(typeof(SolidColorBrush), typeof(Brush))]
 public class ColorBrushConverter : IValueConverter

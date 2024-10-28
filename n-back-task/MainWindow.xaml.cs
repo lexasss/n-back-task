@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace CttTest;
+namespace NBackTask;
 
 public partial class MainWindow : Window
 {
