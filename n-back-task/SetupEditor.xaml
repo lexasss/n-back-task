@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:NBackTask"
         mc:Ignorable="d"
         Title="Setup Editor"
-        Height="250"
+        Height="268"
         Width="220"
         Icon="/icon.png"
         ResizeMode="NoResize"
@@ -35,22 +35,41 @@
             <Setter Property="Padding" Value="4"/>
         </Style>
         <Style TargetType="TextBox">
-            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Width" Value="76"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,2"/>
             <Style.Triggers>
                 <Trigger Property="Validation.HasError" Value="true">
                     <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self},Path=(Validation.Errors)/ErrorContent}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Width" Value="76"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+        </Style>
+        <Style x:Key="Setups" TargetType="ComboBox">
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
     </Window.Resources>
     
     <Grid Margin="4">
         <StackPanel>
             <Label>Setup</Label>
-            <ComboBox ItemsSource="{Binding SetupNames}"
-                      SelectedIndex="{Binding SelectedSetupIndex, Mode=TwoWay}"/>
+            <ComboBox Style="{StaticResource Setups}"
+                      ItemsSource="{Binding SetupNames}"
+                      SelectedIndex="{Binding SelectedSetupIndex, Mode=TwoWay}"
+                      HorizontalAlignment="Stretch"/>
             <StackPanel Margin="0,4">
                 <Grid>
                     <Label>Row count</Label>
@@ -78,16 +97,12 @@
                 </Grid>
                 <Grid>
                     <Label>Stimuli order</Label>
-                    <ComboBox Width="100"
-                              HorizontalAlignment="Right"
-                              ItemsSource="{Binding Source={StaticResource stimuliOrder}}"
+                    <ComboBox ItemsSource="{Binding Source={StaticResource stimuliOrder}}"
                               SelectedItem="{Binding SetupData.StimuliOrder, Mode=TwoWay}"/>
                 </Grid>
                 <Grid>
                     <Label>Alignment</Label>
-                    <ComboBox Width="100"
-                              HorizontalAlignment="Right"
-                              ItemsSource="{Binding Source={StaticResource horizontalAlignment}}"
+                    <ComboBox ItemsSource="{Binding Source={StaticResource horizontalAlignment}}"
                               SelectedItem="{Binding SetupData.Alignment, Mode=TwoWay}"/>
                 </Grid>
             </StackPanel>

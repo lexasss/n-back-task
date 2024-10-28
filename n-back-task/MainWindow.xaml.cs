@@ -112,6 +112,8 @@ public partial class MainWindow : Window
         DisplayInfo($"Setup '{setup.Name}'");
         DisplayInfo("Press ENTER to start", 3000);
 
+        Title = $"N-Back task: {setup.Name}";
+
         grdSetup.Children.Clear();
         _stimuliElements.Clear();
 
@@ -221,6 +223,7 @@ public partial class MainWindow : Window
         Dispatcher.Invoke(() =>
         {
             grdSetup.Visibility = Visibility.Hidden;
+            tblInstructions.Visibility = Visibility.Visible;
 
             DisplayInfo("Finished!");
             DisplayInfo("Press ENTER to start", 2000);
@@ -297,6 +300,7 @@ public partial class MainWindow : Window
         {
             if (!_procedure.IsRunning)
             {
+                tblInstructions.Visibility = Visibility.Hidden;
                 _procedure.Run(_settings.SetupIndex);
             }
         }
@@ -307,6 +311,7 @@ public partial class MainWindow : Window
                 _procedure.Stop();
 
                 grdSetup.Visibility = Visibility.Hidden;
+                tblInstructions.Visibility = Visibility.Visible;
 
                 DisplayInfo("Interrupted");
                 DisplayInfo("Press ENTER to start", 2000);

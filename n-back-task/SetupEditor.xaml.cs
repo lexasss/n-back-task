@@ -38,6 +38,19 @@ public partial class SetupEditor : Window, INotifyPropertyChanged
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
+        var numOfInstructions = Player.NumberOfInstructions;
+        foreach (SetupData setup in _setups)
+        {
+            var targetCount = setup.ColumnCount * setup.RowCount;
+            if (targetCount > numOfInstructions)
+            {
+                MessageBox.Show($"This app has only {numOfInstructions} audio instructions, but the setup '{setup.Name}' has {targetCount} targets.\n\n" +
+                    $"Please either select less rows/column for this setup, or add more {Player.AudioType} instructions to the folder '{Player.SoundsFolder}'",
+                    "N-Back task", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+        }
+        
         DialogResult = true;
     }
 }

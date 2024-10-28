@@ -14,13 +14,14 @@
     
     <Grid x:Name="grdContainer">
         <TextBlock x:Name="tblInstructions"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Top">
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Bottom"
+                   Margin="8">
             <Run>F2 - Settings</Run>
             <LineBreak/>
             <Run>F3 - Setup editor</Run>
             <LineBreak/>
-            <Run>1-5 - Setup</Run>
+            <Run>1-5 - Select a setup</Run>
         </TextBlock>
         <Label x:Name="lblInfo"
                FontSize="42"

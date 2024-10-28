@@ -7,8 +7,8 @@
         xmlns:local="clr-namespace:NBackTask"
         mc:Ignorable="d"
         Title="Settings"
-        Height="620"
-        Width="240"
+        Height="362"
+        Width="480"
         Icon="/icon.png"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
@@ -45,7 +45,7 @@
             <Setter Property="Width" Value="46"/>
         </Style>
         <Style TargetType="CheckBox">
-            <Setter Property="Height" Value="28"/>
+            <Setter Property="Height" Value="26"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Margin" Value="4,0"/>
         </Style>
@@ -58,13 +58,28 @@
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Width" Value="46"/>
-            <Setter Property="Height" Value="24"/>
-            <Setter Property="Margin" Value="0,2,0,4"/>
+            <Setter Property="Margin" Value="0,2,0,2"/>
+        </Style>
+        <Style x:Key="Header" TargetType="Label">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
         </Style>
     </Window.Resources>
 
     <Grid>
-        <StackPanel Margin="4">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.Column="0"
+                    Margin="4">
+            <Label Style="{StaticResource Header}">View</Label>
             <Grid>
                 <Label>Screen background</Label>
                 <Button x:Name="btnScreenColor" Style="{StaticResource Color}" Click="Color_Click">
@@ -129,8 +144,11 @@
                 </TextBox>
             </Grid>
 
-            <Separator/>
-
+        </StackPanel>
+        
+        <StackPanel Grid.Row="0" Grid.Column="1"
+                    Margin="12,4,4,4">
+            <Label Style="{StaticResource Header}">Procedure</Label>
             <Grid>
                 <Label>Blank screen duration, ms</Label>
                 <TextBox x:Name="txbBlankScreenDuration">
@@ -174,13 +192,15 @@
                 </TextBox>
             </Grid>
 
-            <Separator/>
+            <Separator Margin="0,26,0,0"/>
 
-            <StackPanel>
+            <Grid>
                 <Label>Input mode</Label>
-                <ComboBox ItemsSource="{Binding Source={StaticResource inputModes}}"
+                <ComboBox Width="80"
+                          HorizontalAlignment="Right"
+                          ItemsSource="{Binding Source={StaticResource inputModes}}"
                           SelectedItem="{Binding Path=InputMode}"/>
-            </StackPanel>
+            </Grid>
             <Grid>
                 <Label>Number of trials</Label>
                 <TextBox x:Name="txbTrialCount">
@@ -194,49 +214,52 @@
                 </TextBox>
             </Grid>
 
-            <StackPanel>
-                <Label>Log folder</Label>
-                <Grid Margin="4,0">
-                    <TextBlock Text="{Binding LogFolder, Mode=OneWay, Converter={StaticResource pathUI}}"
-                               Margin="0,0,36,0"
-                               TextWrapping="Wrap"
-                               FontFamily="Consolas"
-                               VerticalAlignment="Center"/>
-                    <Button Style="{StaticResource Iconic}"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            Content="..."
-                            Click="SelectFolder_Click"/>
-                </Grid>
-            </StackPanel>
         </StackPanel>
 
-        <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
-            <Button Content="Save"
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+            <Separator/>
+            <Grid Margin="4,0">
+                <Label>Log folder</Label>
+                <TextBlock Text="{Binding LogFolder, Mode=OneWay, Converter={StaticResource pathUI}}"
+                            Margin="76,0,36,0"
+                            TextWrapping="Wrap"
+                            FontFamily="Consolas"
+                            VerticalAlignment="Center"/>
+                <Button Style="{StaticResource Iconic}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Content="..."
+                        Click="SelectFolder_Click"/>
+            </Grid>
+            
+            <WrapPanel HorizontalAlignment="Center"
+                       Margin="0,8,0,0">
+                <Button Content="Save"
                     IsDefault="True"
                     Click="Save_Click">
-                <Button.Style>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CloseButton}">
-                        <Setter Property="IsEnabled" Value="false" />
-                        <Style.Triggers>
-                            <!-- Require the controls to be valid in order to press Save -->
-                            <MultiDataTrigger>
-                                <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding ElementName=txbStimulusBorder, Path=(Validation.HasError)}" Value="False" />
-                                    <Condition Binding="{Binding ElementName=txbStimulusGap, Path=(Validation.HasError)}" Value="False" />
-                                    <Condition Binding="{Binding ElementName=txbBlankScreenDuration, Path=(Validation.HasError)}" Value="False" />
-                                    <Condition Binding="{Binding ElementName=txbStimulusDuration, Path=(Validation.HasError)}" Value="False" />
-                                    <Condition Binding="{Binding ElementName=txbResultDisplayDuration, Path=(Validation.HasError)}" Value="False" />
-                                    <Condition Binding="{Binding ElementName=txbTrialCount, Path=(Validation.HasError)}" Value="False" />
-                                </MultiDataTrigger.Conditions>
-                                <Setter Property="IsEnabled" Value="True" />
-                            </MultiDataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-            <Button Style="{StaticResource CloseButton}" Content="Cancel"
+                    <Button.Style>
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CloseButton}">
+                            <Setter Property="IsEnabled" Value="false" />
+                            <Style.Triggers>
+                                <!-- Require the controls to be valid in order to press Save -->
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding ElementName=txbStimulusBorder, Path=(Validation.HasError)}" Value="False" />
+                                        <Condition Binding="{Binding ElementName=txbStimulusGap, Path=(Validation.HasError)}" Value="False" />
+                                        <Condition Binding="{Binding ElementName=txbBlankScreenDuration, Path=(Validation.HasError)}" Value="False" />
+                                        <Condition Binding="{Binding ElementName=txbStimulusDuration, Path=(Validation.HasError)}" Value="False" />
+                                        <Condition Binding="{Binding ElementName=txbResultDisplayDuration, Path=(Validation.HasError)}" Value="False" />
+                                        <Condition Binding="{Binding ElementName=txbTrialCount, Path=(Validation.HasError)}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="IsEnabled" Value="True" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Style="{StaticResource CloseButton}" Content="Cancel"
                     IsCancel="True"/>
-        </WrapPanel>
+            </WrapPanel>
+        </StackPanel>
     </Grid>
 </Window>

@@ -152,6 +152,8 @@ internal class Player
     public static string SoundsFolder => "assets/sounds";
     public static string AudioType => "mp3";
 
+    public static int NumberOfInstructions => Directory.GetFiles(SoundsFolder, $"*.{AudioType}").Length;
+
     public Player()
     {
         var mp3Files = Directory.GetFiles(SoundsFolder, $"*.{AudioType}");
