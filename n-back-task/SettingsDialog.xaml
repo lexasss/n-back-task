@@ -9,14 +9,14 @@
         Title="Settings"
         Height="620"
         Width="240"
+        Icon="/icon.png"
         ResizeMode="NoResize"
-        WindowStartupLocation="CenterOwner"
-        PreviewKeyUp="Window_PreviewKeyUp"
-        Icon="/icon.png">
+        WindowStartupLocation="CenterScreen">
     
     <Window.Resources>
         <local:ColorBrushConverter x:Key="scb2brush"/>
         <local:NegateConverter x:Key="not"/>
+        <local:PathUIConverter x:Key="pathUI"/>
 
         <ObjectDataProvider x:Key="inputModes" MethodName="GetValues"
                             ObjectType="{x:Type System:Enum}">
@@ -25,7 +25,7 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
         
-        <Style TargetType="Button">
+        <Style x:Key="CloseButton" TargetType="Button">
             <Setter Property="MinWidth" Value="60"/>
             <Setter Property="Margin" Value="4"/>
             <Setter Property="Padding" Value="4"/>
@@ -59,7 +59,7 @@
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Width" Value="46"/>
             <Setter Property="Height" Value="24"/>
-            <Setter Property="Margin" Value="0,0,0,4"/>
+            <Setter Property="Margin" Value="0,2,0,4"/>
         </Style>
     </Window.Resources>
 
@@ -106,32 +106,72 @@
 
             <Grid>
                 <Label>Stimulus border, px</Label>
-                <TextBox Text="{Binding StimulusBorderThickness, Mode=TwoWay}"/>
+                <TextBox x:Name="txbStimulusBorder">
+                    <TextBox.Text>
+                        <Binding Path="StimulusBorderThickness" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <local:RangeRule Min="0" Max="60" ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
             </Grid>
             <Grid>
                 <Label>Inter-stimulus gap, px</Label>
-                <TextBox Text="{Binding StimulusGap, Mode=TwoWay}"/>
+                <TextBox x:Name="txbStimulusGap">
+                    <TextBox.Text>
+                        <Binding Path="StimulusGap" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <local:RangeRule Min="0" Max="200" ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
             </Grid>
 
             <Separator/>
 
             <Grid>
                 <Label>Blank screen duration, ms</Label>
-                <TextBox Text="{Binding BlankScreenDuration, Mode=TwoWay}"/>
+                <TextBox x:Name="txbBlankScreenDuration">
+                    <TextBox.Text>
+                        <Binding Path="BlankScreenDuration" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <local:RangeRule Min="0" Max="60000" ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
             </Grid>
             <Grid>
                 <Label>Stimulus duration, ms</Label>
-                <TextBox Text="{Binding StimulusDuration, Mode=TwoWay}"/>
+                <TextBox x:Name="txbStimulusDuration">
+                    <TextBox.Text>
+                        <Binding Path="StimulusDuration" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <local:RangeRule Min="100" Max="60000" ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
             </Grid>
             <CheckBox x:Name="chkActivationInterruptsTrial"
-                      Content="Activation interrupts trial"
+                      Content="Activation interrupts a trial"
                       IsChecked="{Binding ActivationInterruptsTrial, Mode=TwoWay}"/>
             <CheckBox Content="Allow multiple activations"
                       IsChecked="{Binding AllowMultipleActivations, Mode=TwoWay}"
                       IsEnabled="{Binding IsChecked, ElementName=chkActivationInterruptsTrial, Converter={StaticResource not}}"/>
             <Grid>
                 <Label>Result display duration, ms</Label>
-                <TextBox Text="{Binding InfoDuration, Mode=TwoWay}"/>
+                <TextBox x:Name="txbResultDisplayDuration">
+                    <TextBox.Text>
+                        <Binding Path="InfoDuration" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <local:RangeRule Min="0" Max="10000" ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
             </Grid>
 
             <Separator/>
@@ -143,15 +183,24 @@
             </StackPanel>
             <Grid>
                 <Label>Number of trials</Label>
-                <TextBox Text="{Binding TrialCount, Mode=TwoWay}"/>
+                <TextBox x:Name="txbTrialCount">
+                    <TextBox.Text>
+                        <Binding Path="TrialCount" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <local:RangeRule Min="1" Max="1000" ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
             </Grid>
 
             <StackPanel>
                 <Label>Log folder</Label>
                 <Grid Margin="4,0">
-                    <TextBlock Text="{Binding LogFolder, Mode=OneWay}"
+                    <TextBlock Text="{Binding LogFolder, Mode=OneWay, Converter={StaticResource pathUI}}"
                                Margin="0,0,36,0"
                                TextWrapping="Wrap"
+                               FontFamily="Consolas"
                                VerticalAlignment="Center"/>
                     <Button Style="{StaticResource Iconic}"
                             HorizontalAlignment="Right"
@@ -163,8 +212,31 @@
         </StackPanel>
 
         <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
-            <Button Content="Save" Click="Save_Click"/>
-            <Button Content="Cancel" Click="Cancel_Click"/>
+            <Button Content="Save"
+                    IsDefault="True"
+                    Click="Save_Click">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CloseButton}">
+                        <Setter Property="IsEnabled" Value="false" />
+                        <Style.Triggers>
+                            <!-- Require the controls to be valid in order to press Save -->
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding ElementName=txbStimulusBorder, Path=(Validation.HasError)}" Value="False" />
+                                    <Condition Binding="{Binding ElementName=txbStimulusGap, Path=(Validation.HasError)}" Value="False" />
+                                    <Condition Binding="{Binding ElementName=txbBlankScreenDuration, Path=(Validation.HasError)}" Value="False" />
+                                    <Condition Binding="{Binding ElementName=txbStimulusDuration, Path=(Validation.HasError)}" Value="False" />
+                                    <Condition Binding="{Binding ElementName=txbResultDisplayDuration, Path=(Validation.HasError)}" Value="False" />
+                                    <Condition Binding="{Binding ElementName=txbTrialCount, Path=(Validation.HasError)}" Value="False" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="IsEnabled" Value="True" />
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Style="{StaticResource CloseButton}" Content="Cancel"
+                    IsCancel="True"/>
         </WrapPanel>
     </Grid>
 </Window>

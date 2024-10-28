@@ -9,7 +9,16 @@ public enum StimuliOrder
     Randomized
 }
 
-public class SetupData
+public interface ISetup
+{
+    public string Name { get; }
+    public int RowCount { get; }
+    public int ColumnCount { get; }
+    public StimuliOrder StimuliOrder { get; }
+    public HorizontalAlignment Alignment { get; }
+}
+
+public class SetupData : ISetup
 {
     public string Name { get; init; } = "";
     public int RowCount { get; set; }
@@ -27,30 +36,26 @@ public class SetupData
     };
 }
 
-public class Setup
+public class Setup : ISetup
 {
-    public string Name { get; protected set; }
-    public int RowCount { get; protected set; }
-    public int ColumnCount { get; protected set; }
-    public HorizontalAlignment Alignment { get; protected set; }
-    public StimuliOrder StimuliOrder { get; protected set; }
-
-    public int TrialCount { get; set; }
+    public string Name { get; }
+    public int RowCount { get; }
+    public int ColumnCount { get; }
+    public HorizontalAlignment Alignment { get; }
+    public StimuliOrder StimuliOrder { get; }
 
     public Stimulus[] Stimuli => _stimuli.ToArray();
 
     public static Type[] GetAllTypes() => System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
         .Where(type => type.IsSubclassOf(typeof(Setup))).ToArray();
 
-    public Setup(SetupData data)
+    public Setup(ISetup data)
     {
         Name = data.Name;
         RowCount = data.RowCount;
         ColumnCount = data.ColumnCount;
         StimuliOrder = data.StimuliOrder;
         Alignment = data.Alignment;
-
-        TrialCount = Settings.Instance.TrialCount;
 
         CreateStimuli();
     }
@@ -76,8 +81,6 @@ public class Setup
                 StimuliOrder = thisSetup.StimuliOrder;
             }
         }
-
-        TrialCount = Settings.Instance.TrialCount;
 
         CreateStimuli();
     }
@@ -106,29 +109,11 @@ public class Setup
         return null;
     }
 
-    public int[] PrepareTargets()
-    {
-        List<int> indexes = [];
-        while (indexes.Count < TrialCount)
-        {
-            indexes.AddRange(_stimuli.Select((btn, i) => i));
-        }
-
-        indexes.RemoveRange(TrialCount, indexes.Count - TrialCount);
-
-        Span<int> shuffledIndexes = indexes.ToArray();
-        _random.Shuffle(shuffledIndexes);
-
-        return shuffledIndexes.ToArray();
-    }
-
     public override string ToString() => Name;
 
     // Internal
 
     protected List<Stimulus> _stimuli = [];
-
-    readonly Random _random = new();
 
     private void CreateStimuli()
     {

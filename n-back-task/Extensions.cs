@@ -40,5 +40,5 @@ internal static class SolidColorBrushExt
             .GetProperties()
             .Where(prop => prop.PropertyType == typeof(Color))
             .ToDictionary(prop => prop.Name,
-                          prop => (Color)prop.GetValue(null));
+                          prop => prop.GetValue(null) is Color color ? color : Colors.Black );
 }

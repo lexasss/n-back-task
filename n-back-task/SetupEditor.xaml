@@ -12,7 +12,7 @@
         Width="220"
         Icon="/icon.png"
         ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen" PreviewKeyUp="Window_PreviewKeyUp">
+        WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <ObjectDataProvider x:Key="stimuliOrder" MethodName="GetValues"
@@ -29,7 +29,7 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
 
-        <Style TargetType="Button">
+        <Style x:Key="CloseButton" TargetType="Button">
             <Setter Property="MinWidth" Value="60"/>
             <Setter Property="Margin" Value="4"/>
             <Setter Property="Padding" Value="4"/>
@@ -38,6 +38,11 @@
             <Setter Property="Width" Value="100"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self},Path=(Validation.Errors)/ErrorContent}"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
     
@@ -49,11 +54,27 @@
             <StackPanel Margin="0,4">
                 <Grid>
                     <Label>Row count</Label>
-                    <TextBox Text="{Binding Path=SetupData.RowCount, Mode=TwoWay}"/>
+                    <TextBox x:Name="txbRowCount">
+                        <TextBox.Text>
+                            <Binding Path="SetupData.RowCount" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                                <Binding.ValidationRules>
+                                    <local:RangeRule Min="1" Max="5" ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
                 </Grid>
                 <Grid>
                     <Label>Column count</Label>
-                    <TextBox Text="{Binding Path=SetupData.ColumnCount, Mode=TwoWay}"/>
+                    <TextBox x:Name="txbColCount">
+                        <TextBox.Text>
+                            <Binding Path="SetupData.ColumnCount" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                                <Binding.ValidationRules>
+                                    <local:RangeRule Min="1" Max="5" ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
                 </Grid>
                 <Grid>
                     <Label>Stimuli order</Label>
@@ -73,8 +94,28 @@
         </StackPanel>
 
         <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
-            <Button Content="Save" Click="Save_Click"/>
-            <Button Content="Cancel" Click="Cancel_Click"/>
+            <Button Content="Save" 
+                    IsDefault="True"
+                    Click="Save_Click">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CloseButton}">
+                        <Setter Property="IsEnabled" Value="false" />
+                        <Style.Triggers>
+                            <!-- Require the controls to be valid in order to press Save -->
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding ElementName=txbRowCount, Path=(Validation.HasError)}" Value="False" />
+                                    <Condition Binding="{Binding ElementName=txbColCount, Path=(Validation.HasError)}" Value="False" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="IsEnabled" Value="True" />
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Style="{StaticResource CloseButton}"
+                    Content="Cancel"
+                    IsCancel="True"/>
         </WrapPanel>
     </Grid>
 </Window>

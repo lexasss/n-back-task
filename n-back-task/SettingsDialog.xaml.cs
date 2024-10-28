@@ -20,16 +20,6 @@ public partial class SettingsDialog : Window
 
     // UI
 
-    private void Save_Click(object sender, RoutedEventArgs e)
-    {
-        DialogResult = true;
-    }
-
-    private void Cancel_Click(object sender, RoutedEventArgs e)
-    {
-        DialogResult = false;
-    }
-
     private void Color_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.Content is Rectangle rect)
@@ -55,11 +45,8 @@ public partial class SettingsDialog : Window
         }
     }
 
-    private void Window_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+    private void Save_Click(object sender, RoutedEventArgs e)
     {
-        if (e.Key == System.Windows.Input.Key.Escape)
-        {
-            DialogResult = false;
-        }
+        DialogResult = true;
     }
 }

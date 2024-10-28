@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using System.Windows;
 
 namespace NBackTask;
@@ -29,14 +30,6 @@ internal class Procedure
 
         _player.CheckSoundsExist(audioFiIlename.ToArray());
 
-        _settings.Updated += (s, e) =>
-        {
-            foreach (var setup in Setups)
-            {
-                setup.TrialCount = _settings.TrialCount;
-            }
-        };
-
         Application.Current.Exit += (s, e) =>
         {
             var setups = Setups.Select(SetupData.From).ToArray();
@@ -60,7 +53,7 @@ internal class Procedure
         _logger.Reset();
         _logger.Add("experiment", "start", CurrentSetup.Name);
 
-        _targetIndexes = CurrentSetup.PrepareTargets();
+        _targetIndexes = PrepareTargets(CurrentSetup);
 
         _trialIndex = -1;
 
@@ -144,6 +137,7 @@ internal class Procedure
     readonly Player _player = new();
     readonly Logger _logger = Logger.Instance;
     readonly Settings _settings = Settings.Instance;
+    readonly Random _random = new();
 
     State _state = State.Inactive;
     int[] _targetIndexes = [];
@@ -156,7 +150,7 @@ internal class Procedure
 
         CurrentSetup.ResetStimuli();
 
-        if (++_trialIndex < CurrentSetup.TrialCount)
+        if (++_trialIndex < _settings.TrialCount)
         {
             UpdateState(State.BlankScreen);
         }
@@ -235,6 +229,23 @@ internal class Procedure
             _logger.Add("experiment", "stop");
         }
     }
+
+    private int[] PrepareTargets(Setup setup)
+    {
+        List<int> indexes = [];
+        while (indexes.Count < _settings.TrialCount)
+        {
+            indexes.AddRange(setup.Stimuli.Select((btn, i) => i));
+        }
+
+        indexes.RemoveRange(_settings.TrialCount, indexes.Count - _settings.TrialCount);
+
+        Span<int> shuffledIndexes = indexes.ToArray();
+        _random.Shuffle(shuffledIndexes);
+
+        return shuffledIndexes.ToArray();
+    }
+
 
     private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
