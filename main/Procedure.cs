@@ -5,7 +5,7 @@ namespace NBackTask;
 
 internal class Procedure
 {
-    public Setup[] Setups { get; } = [];
+    public Setup[] Setups => _setups.ToArray();
     public Setup? CurrentSetup { get; private set; } = null;
 
     public bool IsRunning => _state != State.Inactive;
@@ -20,9 +20,9 @@ internal class Procedure
         _timer.AutoReset = false;
         _timer.Elapsed += Timer_Elapsed;
 
-        Setups = LoadSetups();
+        _setups = LoadSetups();
 
-        var audioFilenames = Setups.SelectMany(setup => setup.Stimuli.Select(stimulus => stimulus.AudioInstruction)).ToList();
+        var audioFilenames = _setups.SelectMany(setup => setup.Stimuli.Select(stimulus => stimulus.AudioInstruction)).ToList();
         audioFilenames.Add(SOUND_CORRECT);
         audioFilenames.Add(SOUND_INCORRECT);
 
@@ -36,10 +36,10 @@ internal class Procedure
         if (_state != State.Inactive)
             return;
 
-        if (setupIndex < 0 || setupIndex >= Setups.Length)
+        if (setupIndex < 0 || setupIndex >= _setups.Count)
             return;
 
-        CurrentSetup = Setups[setupIndex];
+        CurrentSetup = _setups[setupIndex];
 
         _logger.Reset();
         _logger.Add("experiment", "start", CurrentSetup.Name);
@@ -98,17 +98,22 @@ internal class Procedure
         _logger.Add("stimuli", "order", string.Join(' ', stimuli.Select(s => s.Text)));
     }
 
-    public void ShowSetupEditor()
+    public int? ShowSetupEditor()
     {
-        var setups = Setups.Select(SetupData.From).ToArray();
+        var setups = _setups.Select(SetupData.From).ToList();
         var dialog = new SetupEditor(setups, _settings.SetupIndex);
         if (dialog.ShowDialog() == true)
         {
-            for (int i = 0; i < Setups.Length; i++)
+            _setups.Clear();
+            foreach (var sd in setups)
             {
-                Setups[i] = new Setup(setups[i]);
+                _setups.Add(new Setup(sd));
             }
+
+            return dialog.SelectedSetupIndex;
         }
+
+        return null;
     }
 
     // Internal
@@ -129,12 +134,13 @@ internal class Procedure
     readonly Logger _logger = Logger.Instance;
     readonly Settings _settings = Settings.Instance;
     readonly Random _random = new();
+    readonly List<Setup> _setups = [];
 
     State _state = State.Inactive;
     int[] _targetIndexes = [];
     int _trialIndex = -1;
 
-    public Setup[] LoadSetups()
+    public List<Setup> LoadSetups()
     {
         var setups = new List<Setup>();
 
@@ -158,12 +164,12 @@ internal class Procedure
             setups.Add(new Setup("Very Hard", 2, 5, HorizontalAlignment.Stretch, StimuliOrder.Randomized));
         }
 
-        return setups.ToArray();
+        return setups;
     }
 
     private void SaveSetups()
     {
-        var setups = Setups.Select(SetupData.From).ToArray();
+        var setups = _setups.Select(SetupData.From).ToArray();
         var setupString = JsonSerializer.Serialize(setups);
 
         Properties.Settings.Default.Setups = setupString;

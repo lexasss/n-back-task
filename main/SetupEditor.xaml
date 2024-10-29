@@ -34,6 +34,13 @@
             <Setter Property="Margin" Value="4"/>
             <Setter Property="Padding" Value="4"/>
         </Style>
+        <Style x:Key="Iconic" TargetType="Button">
+            <Setter Property="Width" Value="26"/>
+            <Setter Property="Height" Value="26 "/>
+            <Setter Property="Margin" Value="2,0,0,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
         <Style TargetType="TextBox">
             <Setter Property="Height" Value="26"/>
             <Setter Property="Width" Value="76"/>
@@ -65,11 +72,46 @@
     
     <Grid Margin="4">
         <StackPanel>
-            <Label>Setup</Label>
-            <ComboBox Style="{StaticResource Setups}"
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label>Setup</Label>
+                <Button Grid.Column="1" Style="{StaticResource Iconic}"
+                        Content="+"
+                        Padding="0"
+                        FontSize="17"
+                        VerticalContentAlignment="Top"
+                        ToolTip="Create a new setup"
+                        Click="CreateSetup_Click"/>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox Style="{StaticResource Setups}"
                       ItemsSource="{Binding SetupNames}"
                       SelectedIndex="{Binding SelectedSetupIndex, Mode=TwoWay}"
                       HorizontalAlignment="Stretch"/>
+                <Button Grid.Column="1" Style="{StaticResource Iconic}"
+                        IsEnabled="{Binding CanDeleteSetup}"
+                        ToolTip="Delete the current setup"
+                        Padding="6"
+                        Click="DeleteSetup_Click">
+                    <Image Source="/assets/images/delete.png"/>
+                </Button>
+                <Button Grid.Column="1" Style="{StaticResource Iconic}"
+                    IsEnabled="{Binding CanDeleteSetup}"
+                    ToolTip="Delete the current setup"
+                    Padding="6"
+                    Click="DeleteSetup_Click">
+                    <Image Source="/assets/images/delete.png"/>
+                </Button>
+            </Grid>
             <StackPanel Margin="0,4">
                 <Grid>
                     <Label>Row count</Label>

@@ -344,7 +344,10 @@ public partial class MainWindow : Window
         {
             if (!_procedure.IsRunning)
             {
-                _procedure.ShowSetupEditor();
+                if (_procedure.ShowSetupEditor() is int selectedIndex)
+                {
+                    LoadSetup(selectedIndex);
+                }
             }
         }
     }

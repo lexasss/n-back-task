@@ -219,13 +219,19 @@
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <Separator/>
             <Grid Margin="4,0">
-                <Label>Log folder</Label>
-                <TextBlock Text="{Binding LogFolder, Mode=OneWay, Converter={StaticResource pathUI}}"
-                            Margin="76,0,36,0"
-                            TextWrapping="Wrap"
-                            FontFamily="Consolas"
-                            VerticalAlignment="Center"/>
-                <Button Style="{StaticResource Iconic}"
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <Label Grid.Column="0">Log folder</Label>
+                <TextBlock Grid.Column="1" Text="{Binding LogFolder, Mode=OneWay, Converter={StaticResource pathUI}}"
+                           Margin="8,0"
+                           TextWrapping="Wrap"
+                           FontFamily="Consolas"
+                           VerticalAlignment="Center"/>
+                <Button Grid.Column="2" Style="{StaticResource Iconic}"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         Content="..."

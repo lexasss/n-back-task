@@ -17,7 +17,7 @@ public interface ISetup
     public HorizontalAlignment Alignment { get; }
 }
 
-public class SetupData : ISetup
+public record class SetupData : ISetup
 {
     public string Name { get; init; } = "";
     public int RowCount { get; set; }

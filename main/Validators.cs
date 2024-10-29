@@ -31,3 +31,17 @@ public class RangeRule : ValidationRule
         return ValidationResult.ValidResult;
     }
 }
+
+public class NonBlankRule : ValidationRule
+{
+    public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+    {
+        var result = ((string)value).Length > 0;
+        if (!result)
+        {
+            return new ValidationResult(false, $"The text cannot be blank");
+        }
+
+        return ValidationResult.ValidResult;
+    }
+}
