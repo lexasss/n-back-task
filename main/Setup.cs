@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using System.Windows;
+﻿using System.Windows;
 
 namespace NBackTask;
 
@@ -46,19 +45,7 @@ public class Setup : ISetup
 
     public Stimulus[] Stimuli => _stimuli.ToArray();
 
-    public static Type[] GetAllTypes() => System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
-        .Where(type => type.IsSubclassOf(typeof(Setup))).ToArray();
-
-    public Setup(ISetup data)
-    {
-        Name = data.Name;
-        RowCount = data.RowCount;
-        ColumnCount = data.ColumnCount;
-        StimuliOrder = data.StimuliOrder;
-        Alignment = data.Alignment;
-
-        CreateStimuli();
-    }
+    public Setup(ISetup data) : this(data.Name, data.RowCount, data.ColumnCount, data.Alignment, data.StimuliOrder) { }
 
     public Setup(string name, int rowCount, int columnCount, HorizontalAlignment alignment, StimuliOrder order)
     {
@@ -68,28 +55,22 @@ public class Setup : ISetup
         StimuliOrder = order;
         Alignment = alignment;
 
-        var settings = Properties.Settings.Default;
-        if (!string.IsNullOrEmpty(settings.Setups))
-        {
-            var setups = JsonSerializer.Deserialize<SetupData[]>(settings.Setups);
-            var thisSetup = setups?.FirstOrDefault(setup => setup.Name == Name);
-            if (thisSetup != null)
-            {
-                RowCount = thisSetup.RowCount;
-                ColumnCount = thisSetup.ColumnCount;
-                Alignment = thisSetup.Alignment;
-                StimuliOrder = thisSetup.StimuliOrder;
-            }
-        }
-
         CreateStimuli();
     }
 
-    public virtual (int, int) GetStimulusLocation(int stimulusIndex)
+    /// <summary>
+    /// Computes the row and column of a stimulus
+    /// </summary>
+    /// <param name="stimulusIndex">Stimulus index</param>
+    /// <returns>row and column</returns>
+    public (int, int) GetStimulusLocation(int stimulusIndex)
     {
         return (stimulusIndex / ColumnCount, stimulusIndex % ColumnCount);
     }
 
+    /// <summary>
+    /// Remove activation marks from all stimuli
+    /// </summary>
     public void ResetStimuli()
     {
         foreach (Stimulus stimulus in _stimuli)
@@ -98,6 +79,10 @@ public class Setup : ISetup
         }
     }
 
+    /// <summary>
+    /// Return the stimuli marked as active (clicked)
+    /// </summary>
+    /// <returns>The active stimuli</returns>
     public Stimulus? GetActiveStimulus()
     {
         foreach (Stimulus stimulus in _stimuli)
@@ -122,29 +107,4 @@ public class Setup : ISetup
             _stimuli.Add(new Stimulus($"{i % 10}"));
         }
     }
-}
-
-internal class SetupVeryEasy : Setup
-{
-    public SetupVeryEasy() : base("Very Easy", 1, 2, HorizontalAlignment.Stretch, StimuliOrder.Ordered) { }
-}
-
-internal class SetupEasy : Setup
-{
-    public SetupEasy() : base("Easy", 2, 2, HorizontalAlignment.Stretch, StimuliOrder.Ordered) { }
-}
-
-internal class SetupModerate : Setup
-{
-    public SetupModerate() : base("Moderate", 2, 5, HorizontalAlignment.Stretch, StimuliOrder.Ordered) { }
-}
-
-internal class SetupHard : Setup
-{
-    public SetupHard() : base("Hard", 2, 2, HorizontalAlignment.Stretch, StimuliOrder.Randomized) { }
-}
-
-internal class SetupVeryHard : Setup
-{
-    public SetupVeryHard() : base("Very Hard", 2, 5, HorizontalAlignment.Stretch, StimuliOrder.Randomized) { }
 }

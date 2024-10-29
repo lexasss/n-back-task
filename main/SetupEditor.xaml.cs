@@ -20,11 +20,13 @@ public partial class SetupEditor : Window, INotifyPropertyChanged
         }
     }
 
-    internal SetupEditor(SetupData[] setups)
+    internal SetupEditor(SetupData[] setups, int currentIndex)
     {
         InitializeComponent();
 
         _setups = setups;
+        _selectedSetupIndex = currentIndex;
+
         SetupNames = setups.Select(setup => setup.Name);
 
         DataContext = this;

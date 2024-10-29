@@ -81,25 +81,25 @@
                     Margin="4">
             <Label Style="{StaticResource Header}">View</Label>
             <Grid>
-                <Label>Screen background</Label>
+                <Label>Blank screen background</Label>
                 <Button x:Name="btnScreenColor" Style="{StaticResource Color}" Click="Color_Click">
                     <Rectangle Fill="{Binding ScreenColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
                 </Button>
             </Grid>
             <Grid>
-                <Label>Panel background</Label>
+                <Label>Stimuli screen background</Label>
                 <Button x:Name="btnActiveScreenColor" Style="{StaticResource Color}" Click="Color_Click">
                     <Rectangle Fill="{Binding ActiveScreenColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
                 </Button>
             </Grid>
             <Grid>
-                <Label>stimulus background</Label>
+                <Label>Stimulus background</Label>
                 <Button x:Name="btnStimulusColor" Style="{StaticResource Color}" Click="Color_Click">
                     <Rectangle Fill="{Binding StimulusColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
                 </Button>
             </Grid>
             <Grid>
-                <Label>stimulus foreground</Label>
+                <Label>Stimulus foreground</Label>
                 <Button x:Name="btnStimulusFontColor" Style="{StaticResource Color}" Click="Color_Click">
                     <Rectangle Fill="{Binding StimulusFontColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
                 </Button>

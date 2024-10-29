@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Windows;
 
 namespace NBackTask;
@@ -21,23 +20,15 @@ internal class Procedure
         _timer.AutoReset = false;
         _timer.Elapsed += Timer_Elapsed;
 
-        var setupTypes = Setup.GetAllTypes();
-        Setups = setupTypes.Select(type => Activator.CreateInstance(type) as Setup).Where(setup => setup != null).ToArray()!;
+        Setups = LoadSetups();
 
-        var audioFiIlename = Setups.SelectMany(setup => setup.Stimuli.Select(stimulus => stimulus.AudioInstruction)).ToList();
-        audioFiIlename.Add(SOUND_CORRECT);
-        audioFiIlename.Add(SOUND_INCORRECT);
+        var audioFilenames = Setups.SelectMany(setup => setup.Stimuli.Select(stimulus => stimulus.AudioInstruction)).ToList();
+        audioFilenames.Add(SOUND_CORRECT);
+        audioFilenames.Add(SOUND_INCORRECT);
 
-        _player.CheckSoundsExist(audioFiIlename.ToArray());
+        _player.CheckSoundsExist(audioFilenames.ToArray());
 
-        Application.Current.Exit += (s, e) =>
-        {
-            var setups = Setups.Select(SetupData.From).ToArray();
-            var setupString = JsonSerializer.Serialize(setups);
-
-            Properties.Settings.Default.Setups = setupString;
-            Properties.Settings.Default.Save();
-        };
+        Application.Current.Exit += (s, e) => SaveSetups();
     }
 
     public void Run(int setupIndex)
@@ -110,7 +101,7 @@ internal class Procedure
     public void ShowSetupEditor()
     {
         var setups = Setups.Select(SetupData.From).ToArray();
-        var dialog = new SetupEditor(setups);
+        var dialog = new SetupEditor(setups, _settings.SetupIndex);
         if (dialog.ShowDialog() == true)
         {
             for (int i = 0; i < Setups.Length; i++)
@@ -142,6 +133,42 @@ internal class Procedure
     State _state = State.Inactive;
     int[] _targetIndexes = [];
     int _trialIndex = -1;
+
+    public Setup[] LoadSetups()
+    {
+        var setups = new List<Setup>();
+
+        var settings = Properties.Settings.Default;
+
+        if (!string.IsNullOrEmpty(settings.Setups) &&
+            JsonSerializer.Deserialize<SetupData[]>(settings.Setups) is SetupData[] setupItems)
+        {
+            foreach (SetupData sd in setupItems)
+            {
+                setups.Add(new Setup(sd));
+            }
+        }
+
+        if (setups.Count == 0)
+        {
+            setups.Add(new Setup("Very Easy", 1, 2, HorizontalAlignment.Stretch, StimuliOrder.Ordered));
+            setups.Add(new Setup("Easy", 2, 2, HorizontalAlignment.Stretch, StimuliOrder.Ordered));
+            setups.Add(new Setup("Moderate", 2, 5, HorizontalAlignment.Stretch, StimuliOrder.Ordered));
+            setups.Add(new Setup("Hard", 2, 2, HorizontalAlignment.Stretch, StimuliOrder.Randomized));
+            setups.Add(new Setup("Very Hard", 2, 5, HorizontalAlignment.Stretch, StimuliOrder.Randomized));
+        }
+
+        return setups.ToArray();
+    }
+
+    private void SaveSetups()
+    {
+        var setups = Setups.Select(SetupData.From).ToArray();
+        var setupString = JsonSerializer.Serialize(setups);
+
+        Properties.Settings.Default.Setups = setupString;
+        Properties.Settings.Default.Save();
+    }
 
     private void Next()
     {
