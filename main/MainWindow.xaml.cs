@@ -29,6 +29,8 @@ public partial class MainWindow : Window
                 {
                     label.Background = _settings.StimulusColor;
                     label.Foreground = _settings.StimulusFontColor;
+                    label.Width = _settings.StimulusUnstretchedSize;
+                    label.Height = _settings.StimulusUnstretchedSize;
                 }
             }
         };

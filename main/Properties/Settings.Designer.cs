@@ -226,5 +226,17 @@ namespace NBackTask.Properties {
                 this["Setups"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("150")]
+        public int StimulusUnstretchedSize {
+            get {
+                return ((int)(this["StimulusUnstretchedSize"]));
+            }
+            set {
+                this["StimulusUnstretchedSize"] = value;
+            }
+        }
     }
 }

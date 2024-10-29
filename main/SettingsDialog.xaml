@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:NBackTask"
         mc:Ignorable="d"
         Title="Settings"
-        Height="362"
+        Height="394"
         Width="480"
         Icon="/assets/images/icon.png"
         ResizeMode="NoResize"
@@ -52,7 +52,7 @@
         <Style TargetType="ComboBox">
             <Setter Property="Height" Value="26"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="4,2,0,2"/>
+            <Setter Property="Margin" Value="0,2"/>
         </Style>
         <Style TargetType="TextBox">
             <Setter Property="HorizontalAlignment" Value="Right"/>
@@ -143,6 +143,18 @@
                     </TextBox.Text>
                 </TextBox>
             </Grid>
+            <Grid>
+                <Label>Stimulus unstretched size, px</Label>
+                <TextBox x:Name="txbStimulusUnstretchedSize">
+                    <TextBox.Text>
+                        <Binding Path="StimulusUnstretchedSize" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <local:RangeRule Min="20" Max="1000" ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+            </Grid>
 
         </StackPanel>
         
@@ -192,7 +204,7 @@
                 </TextBox>
             </Grid>
 
-            <Separator Margin="0,26,0,0"/>
+            <Separator/>
 
             <Grid>
                 <Label>Input mode</Label>
@@ -256,6 +268,7 @@
                                         <Condition Binding="{Binding ElementName=txbStimulusDuration, Path=(Validation.HasError)}" Value="False" />
                                         <Condition Binding="{Binding ElementName=txbResultDisplayDuration, Path=(Validation.HasError)}" Value="False" />
                                         <Condition Binding="{Binding ElementName=txbTrialCount, Path=(Validation.HasError)}" Value="False" />
+                                        <Condition Binding="{Binding ElementName=txbStimulusUnstretchedSize, Path=(Validation.HasError)}" Value="False" />
                                     </MultiDataTrigger.Conditions>
                                     <Setter Property="IsEnabled" Value="True" />
                                 </MultiDataTrigger>

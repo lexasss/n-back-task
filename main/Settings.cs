@@ -30,6 +30,7 @@ internal class Settings : INotifyPropertyChanged
     public int InfoDuration { get; set; }        // ms
     public bool ActivationInterruptsTrial { get; set; }
     public bool AllowMultipleActivations { get; set; }
+    public int StimulusUnstretchedSize { get; set; }
 
     public InputMode InputMode { get; set; }
     public int TrialCount { get; set; }
@@ -84,6 +85,7 @@ internal class Settings : INotifyPropertyChanged
         settings.InfoDuration = InfoDuration;
         settings.ActivationInterruptsTrial = ActivationInterruptsTrial;
         settings.AllowMultipleActivations = AllowMultipleActivations;
+        settings.StimulusUnstretchedSize = StimulusUnstretchedSize;
 
         settings.InputMode = (int)InputMode;
         settings.TestCount = TrialCount;
@@ -124,6 +126,7 @@ internal class Settings : INotifyPropertyChanged
         InfoDuration = settings.InfoDuration;
         ActivationInterruptsTrial = settings.ActivationInterruptsTrial;
         AllowMultipleActivations = settings.AllowMultipleActivations;
+        StimulusUnstretchedSize = settings.StimulusUnstretchedSize;
 
         InputMode = (InputMode)settings.InputMode;
         TrialCount = settings.TestCount;
