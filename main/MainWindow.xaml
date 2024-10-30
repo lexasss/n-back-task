@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:NBackTask"
         mc:Ignorable="d"
         Title="N-Back task"
-        PreviewKeyUp="Window_KeyUp"
+        PreviewKeyDown="Window_KeyDown"
         Height="450"
         Width="800"
         Closed="Window_Closed"

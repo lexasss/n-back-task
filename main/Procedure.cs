@@ -195,7 +195,7 @@ internal class Procedure
             var filename = _logger.Save();
             if (filename != null)
             {
-                MessageBox.Show($"Data saved to '{filename}'", "N-Back task", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Data saved to '{filename}'", App.Name, MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }

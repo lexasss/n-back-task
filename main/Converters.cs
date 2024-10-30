@@ -24,7 +24,7 @@ public class NegateConverter : IValueConverter
 public class PathUIConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
-        string.IsNullOrEmpty((string)value) ? "[not yet selected]" : value;
+        string.IsNullOrEmpty((string)value) ? "[not selected yet]" : value;
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => value;
 }

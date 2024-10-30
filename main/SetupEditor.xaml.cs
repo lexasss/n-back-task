@@ -47,7 +47,7 @@ public partial class SetupEditor : Window, INotifyPropertyChanged
             {
                 MessageBox.Show($"This app has only {numOfInstructions} audio instructions, but the setup '{setup.Name}' has {targetCount} targets.\n\n" +
                     $"Please either select less rows/column for this setup, or add more {Player.AudioType} instructions to the folder '{Player.SoundsFolder}'",
-                    "N-Back task", MessageBoxButton.OK, MessageBoxImage.Error);
+                    App.Name, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
         }
@@ -62,7 +62,7 @@ public partial class SetupEditor : Window, INotifyPropertyChanged
         {
             if (SetupNames.FirstOrDefault(item => item == setupName) is string)
             {
-                MessageBox.Show($"Setup with name '{setupName}' exist already. Aborted.", "N-Back task", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Setup with name '{setupName}' exist already. Aborted.", App.Name, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -78,9 +78,9 @@ public partial class SetupEditor : Window, INotifyPropertyChanged
 
     private void DeleteSetup_Click(object sender, RoutedEventArgs e)
     {
-        if (MessageBox.Show($"Are you sure to delete the setup '{_setups[_selectedSetupIndex].Name}'?", "N-Back task", 
-            MessageBoxButton.YesNo, 
-            MessageBoxImage.Warning) == MessageBoxResult.Yes)
+        if (MessageBox.Show($"Are you sure to delete the setup '{_setups[_selectedSetupIndex].Name}'?", App.Name, 
+                MessageBoxButton.YesNo, 
+                MessageBoxImage.Warning) == MessageBoxResult.Yes)
         {
             var indexToRemove = _selectedSetupIndex;
 

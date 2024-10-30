@@ -6,6 +6,8 @@ namespace NBackTask;
 
 public partial class App : Application
 {
+    public static string Name => "N-Back task";
+
     public App() : base()
     {
         Startup += Application_Startup;

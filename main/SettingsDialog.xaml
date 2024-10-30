@@ -33,6 +33,7 @@
         <Style x:Key="Iconic" TargetType="Button">
             <Setter Property="Width" Value="28"/>
             <Setter Property="Height" Value="28 "/>
+            <Setter Property="Margin" Value="2"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
@@ -40,7 +41,7 @@
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="VerticalContentAlignment" Value="Stretch"/>
-            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="Margin" Value="2"/>
             <Setter Property="Padding" Value="3"/>
             <Setter Property="Width" Value="46"/>
         </Style>
@@ -52,13 +53,13 @@
         <Style TargetType="ComboBox">
             <Setter Property="Height" Value="26"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="Margin" Value="2"/>
         </Style>
         <Style TargetType="TextBox">
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Width" Value="46"/>
-            <Setter Property="Margin" Value="0,2,0,2"/>
+            <Setter Property="Margin" Value="2"/>
         </Style>
         <Style x:Key="Header" TargetType="Label">
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -236,9 +237,12 @@
                     <ColumnDefinition/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                
-                <Label Grid.Column="0">Log folder</Label>
-                <TextBlock Grid.Column="1" Text="{Binding LogFolder, Mode=OneWay, Converter={StaticResource pathUI}}"
+
+                <Label Grid.Column="0"
+                       VerticalAlignment="Center"
+                       Content="Log folder"/>
+                <TextBlock Grid.Column="1"
+                           Text="{Binding LogFolder, Mode=OneWay, Converter={StaticResource pathUI}}"
                            Margin="8,0"
                            TextWrapping="Wrap"
                            FontFamily="Consolas"

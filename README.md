@@ -2,13 +2,12 @@
 
 ## Usage
 
-- F2 shows the settings dialog
-- F3 shows the setup editor
-- Use numerical keys 1-5 to select the difficulty level
+- Press F2 to display the settings dialog
+- Press F3 to display the setup editor
+- Press 1-5 numerical keys to select the setup
 - Press Enter key to start
-- Esc key interrupts the running task
+- Press Esc to interrupt the running task
 
 ## Notes
 
 - Supports mouse and touch inputs
-- The tool ask for the folder to store log data only once

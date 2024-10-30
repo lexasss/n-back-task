@@ -34,14 +34,10 @@ public partial class SettingsDialog : Window
 
     private void SelectFolder_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new Microsoft.Win32.OpenFolderDialog()
+        var folderName = Logger.SelectLogFolder(_settings.LogFolder);
+        if (folderName != null)
         {
-            DefaultDirectory = _settings.LogFolder
-        };
-
-        if (dialog.ShowDialog() == true)
-        {
-            _settings.LogFolder = dialog.FolderName;
+            _settings.LogFolder = folderName;
         }
     }
 

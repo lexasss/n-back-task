@@ -5,7 +5,7 @@ namespace NBackTask;
 public partial class InputDialog : Window
 {
     public string Prompt { get; set; } = "Please enter a text:";
-    public string Text { get; set; } = "setup";
+    public string Text { get; set; } = "Setup";
 
     public static string? ShowDialog(string prompt, string? defaultValue = null)
     {

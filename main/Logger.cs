@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using System.Windows.Forms;
+using System.Windows;
 
 namespace NBackTask;
 
@@ -31,19 +31,11 @@ internal class Logger
     {
         if (string.IsNullOrEmpty(_settings.LogFolder))
         {
-            var dialog = new Microsoft.Win32.OpenFolderDialog()
-            {
-                DefaultDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                _settings.LogFolder = dialog.FolderName;
-            }
+            var folderName = SelectLogFolder(_settings.LogFolder);
+            if (folderName != null)
+                _settings.LogFolder = folderName;
             else
-            {
                 return null;
-            }
         }
 
         var filename = Path.Join(_settings.LogFolder, $"n-back-task-{DateTime.Now:u}.txt".ToPath());
@@ -66,10 +58,28 @@ internal class Logger
         {
             System.Diagnostics.Debug.WriteLine(ex.Message);
             filename = null;
-            MessageBox.Show($"Cannot save data into '{filename}:\n{ex.Message}'", "N-Back task", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Cannot save data into '{filename}':\n{ex.Message}", App.Name, MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         return filename;
+    }
+
+    public static string? SelectLogFolder(string? folderName = null)
+    {
+        var dialog = new Microsoft.Win32.OpenFolderDialog()
+        {
+            Title = $"Select a folder to store {App.Name} log files",
+            DefaultDirectory = !string.IsNullOrEmpty(folderName) ?
+                folderName :
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            return dialog.FolderName;
+        }
+
+        return null;
     }
 
     // Internal

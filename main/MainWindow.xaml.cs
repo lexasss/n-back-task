@@ -13,29 +13,9 @@ public partial class MainWindow : Window
 
         Background = _settings.ScreenColor;
         grdSetup.Background = _settings.ActiveScreenColor;
-
-        _settings.Updated += (s, e) =>
-        {
-            Background = _settings.ScreenColor;
-            grdSetup.Background = _settings.ActiveScreenColor;
-
-            foreach (Border el in _stimuliElements)
-            {
-                el.BorderBrush = _settings.StimulusFontColor;
-                el.BorderThickness = new Thickness(_settings.StimulusBorderThickness);
-                el.Margin = new Thickness(_settings.StimulusGap / 2);
-                
-                if (el.Child is Label label)
-                {
-                    label.Background = _settings.StimulusColor;
-                    label.Foreground = _settings.StimulusFontColor;
-                    label.Width = _settings.StimulusUnstretchedSize;
-                    label.Height = _settings.StimulusUnstretchedSize;
-                }
-            }
-        };
-
         grdSetup.Visibility = Visibility.Hidden;
+
+        _settings.Updated += (s, e) => UpdateStimuli();
 
         _procedure.NextTrial += Procedure_NextTrial;
         _procedure.StimuliShown += Procedure_StimuliShown;
@@ -114,7 +94,7 @@ public partial class MainWindow : Window
         DisplayInfo($"Setup '{setup.Name}'");
         DisplayInfo("Press ENTER to start", 3000);
 
-        Title = $"N-Back task: {setup.Name}";
+        Title = $"{App.Name}: {setup.Name}";
 
         grdSetup.Children.Clear();
         _stimuliElements.Clear();
@@ -146,9 +126,10 @@ public partial class MainWindow : Window
                 Content = stimulus.Text,
                 HorizontalContentAlignment = HorizontalAlignment.Center,
                 VerticalContentAlignment = VerticalAlignment.Center,
-                FontSize = 128,
+                FontSize = Math.Min(180, stimulus.Size - 10),
                 FontFamily = new FontFamily("Arial"),
                 FontWeight = FontWeight.FromOpenTypeWeight(700),
+                Padding = new Thickness(0),
                 Tag = stimulus
             };
 
@@ -176,6 +157,30 @@ public partial class MainWindow : Window
             _stimuliElements.Add(border);
         }
     }
+
+    private void UpdateStimuli()
+    {
+        Background = _settings.ScreenColor;
+        grdSetup.Background = _settings.ActiveScreenColor;
+
+        foreach (Border el in _stimuliElements)
+        {
+            el.BorderBrush = _settings.StimulusFontColor;
+            el.BorderThickness = new Thickness(_settings.StimulusBorderThickness);
+            el.Margin = new Thickness(_settings.StimulusGap / 2);
+
+            if (el.Child is Label label)
+            {
+                label.Background = _settings.StimulusColor;
+                label.Foreground = _settings.StimulusFontColor;
+                label.Width = _settings.StimulusUnstretchedSize;
+                label.Height = _settings.StimulusUnstretchedSize;
+                label.FontSize = Math.Min(180, _settings.StimulusUnstretchedSize - 10);
+            }
+        }
+    }
+
+    // Event handlers
 
     private void Procedure_NextTrial(object? sender, Setup setup)
     {
@@ -296,7 +301,7 @@ public partial class MainWindow : Window
         _procedure.DeactivateStimulus();
     }
 
-    private void Window_KeyUp(object sender, KeyEventArgs e)
+    private void Window_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter)
         {
