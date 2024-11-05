@@ -104,7 +104,7 @@ public class Setup : ISetup
     {
         for (int i = 1; i <= RowCount * ColumnCount; i++)
         {
-            _stimuli.Add(new Stimulus($"{i}"));
+            _stimuli.Add(new Stimulus($"{i % 10}"));
         }
     }
 }

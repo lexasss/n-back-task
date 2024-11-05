@@ -15,6 +15,8 @@ public partial class MainWindow : Window
         grdSetup.Background = _settings.ActiveScreenColor;
         grdSetup.Visibility = Visibility.Hidden;
 
+        _fontSizeController = new FontSizeController(this);
+
         _settings.Updated += (s, e) => UpdateStimuli();
 
         _procedure.NextTrial += Procedure_NextTrial;
@@ -32,6 +34,7 @@ public partial class MainWindow : Window
     readonly Settings _settings = Settings.Instance;
 
     readonly List<UIElement> _stimuliElements = [];
+    readonly FontSizeController _fontSizeController;
 
     CancellationTokenSource _cts = new();
 
@@ -110,6 +113,9 @@ public partial class MainWindow : Window
         grdSetup.HorizontalAlignment = setup.Alignment;
         grdSetup.VerticalAlignment = setup.Alignment == HorizontalAlignment.Stretch ? VerticalAlignment.Stretch : VerticalAlignment.Center;
 
+        _fontSizeController.StimulusSize = setup.Stimuli[0].Size;
+        _fontSizeController.RowsInLayout = setup.RowCount;
+
         for (int i = 0; i < setup.Stimuli.Length; i++)
         {
             var stimulus = setup.Stimuli[i];
@@ -126,17 +132,18 @@ public partial class MainWindow : Window
                 Content = stimulus.Text,
                 HorizontalContentAlignment = HorizontalAlignment.Center,
                 VerticalContentAlignment = VerticalAlignment.Center,
-                FontSize = Math.Min(180, stimulus.Size - 10),
                 FontFamily = new FontFamily("Arial"),
                 FontWeight = FontWeight.FromOpenTypeWeight(700),
                 Padding = new Thickness(0),
                 Tag = stimulus
             };
 
+            label.SetBinding(FontSizeProperty, _fontSizeController.Binding);
+
             if (setup.Alignment != HorizontalAlignment.Stretch)
             {
-                label.Width = stimulus.Size;
-                label.Height = stimulus.Size;
+                border.Width = stimulus.Size;
+                border.Height = stimulus.Size;
             }
 
             label.Background = _settings.StimulusColor;
