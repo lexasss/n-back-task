@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace ColorPickerWPF.Code
+namespace ColorPickerWPF.Code;
+
+[Flags]
+public enum ColorPickerDialogOptions
 {
-    [Flags]
-    public enum ColorPickerDialogOptions
-    {
-        None,
-        SimpleView,
-        LoadCustomPalette
-    }
+    None,
+    SimpleView,
+    LoadCustomPalette
 }

@@ -1,58 +1,52 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace ColorPickerWPF
+namespace ColorPickerWPF;
+
+public partial class SliderRow : UserControl
 {
-    /// <summary>
-    /// Interaction logic for SliderRow.xaml
-    /// </summary>
-    public partial class SliderRow : UserControl
+    public delegate void SliderRowValueChangedHandler(double value);
+
+    public event SliderRowValueChangedHandler OnValueChanged;
+
+    public string FormatString { get; set; }
+
+    protected bool UpdatingValues = false;
+
+    public SliderRow()
     {
-        public delegate void SliderRowValueChangedHandler(double value);
+        FormatString = "F2";
 
-        public event SliderRowValueChangedHandler OnValueChanged;
+        InitializeComponent();
+    }
 
-        public string FormatString { get; set; }
+    private void Slider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        // Set textbox
+        var value = Slider.Value;
 
-        protected bool UpdatingValues = false;
-
-        public SliderRow()
+        if (!UpdatingValues)
         {
-            FormatString = "F2";
-
-            InitializeComponent();
+            UpdatingValues = true;
+            TextBox.Text = value.ToString(FormatString);
+            OnValueChanged?.Invoke(value);
+            UpdatingValues = false;
         }
+    }
 
-        private void Slider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    private void TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!UpdatingValues)
         {
-            // Set textbox
-            var value = Slider.Value;
+            var text = TextBox.Text;
 
-            if (!UpdatingValues)
+            bool ok = double.TryParse(text, out double parsedValue);
+            if (ok)
             {
                 UpdatingValues = true;
-                TextBox.Text = value.ToString(FormatString);
-                OnValueChanged?.Invoke(value);
+                Slider.Value = parsedValue;
+                OnValueChanged?.Invoke(parsedValue);
                 UpdatingValues = false;
-            }
-        }
-
-        private void TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (!UpdatingValues)
-            {
-                var text = TextBox.Text;
-                bool ok = false;
-                double parsedValue = 0;
-
-                ok = double.TryParse(text, out parsedValue);
-                if (ok)
-                {
-                    UpdatingValues = true;
-                    Slider.Value = parsedValue;
-                    OnValueChanged?.Invoke(parsedValue);
-                    UpdatingValues = false;
-                }
             }
         }
     }
