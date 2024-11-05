@@ -55,6 +55,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ColorPickerWPF\ColorPickerWPF.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="assets\images\icon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

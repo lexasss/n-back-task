@@ -10,7 +10,7 @@ internal class FontSizeController : INotifyPropertyChanged
     public int RowsInLayout { get; set; } = 1;
     public Binding Binding { get; }
 
-    public double FontSize => Math.Min(((_container.ActualHeight - 36) / RowsInLayout - 16) * 0.8, Math.Min(StimulusSize - 10, _maxSize));
+    public double FontSize => Math.Max(6, Math.Min(((_container.ActualHeight - 36) / RowsInLayout - 16) * 0.8, Math.Min(StimulusSize - 10, _maxSize)));
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

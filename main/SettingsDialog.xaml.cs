@@ -24,10 +24,14 @@ public partial class SettingsDialog : Window
     {
         if (sender is Button btn && btn.Content is Rectangle rect)
         {
-            var dialog = new Egorozh.ColorPicker.Dialog.ColorPickerDialog() { Color = (rect.Fill as SolidColorBrush)?.Color ?? Colors.White };
-            if (dialog.ShowDialog() == true)
+            // Use solution from https://github.com/DRKV333/ColorPickerWPF
+            var prevColor = (rect.Fill as SolidColorBrush)?.Color ?? Colors.White;
+            //var dialog = new Egorozh.ColorPicker.Dialog.ColorPickerDialog() { Color = (rect.Fill as SolidColorBrush)?.Color ?? Colors.White };
+            //if (dialog.ShowDialog() == true)
+            if (ColorPickerWPF.ColorPickerWindow.ShowDialog(out Color newColor, prevColor))
             {
-                rect.Fill = new SolidColorBrush(dialog.Color);
+                //rect.Fill = new SolidColorBrush(dialog.Color);
+                rect.Fill = new SolidColorBrush(newColor);
             }
         }
     }
