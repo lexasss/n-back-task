@@ -10,7 +10,9 @@ public partial class SettingsDialog : Window
     internal SettingsDialog(Settings settings)
     {
         InitializeComponent();
+
         _settings = settings;
+
         DataContext = settings;
     }
 
@@ -28,7 +30,10 @@ public partial class SettingsDialog : Window
             var prevColor = (rect.Fill as SolidColorBrush)?.Color ?? Colors.White;
             //var dialog = new Egorozh.ColorPicker.Dialog.ColorPickerDialog() { Color = (rect.Fill as SolidColorBrush)?.Color ?? Colors.White };
             //if (dialog.ShowDialog() == true)
-            if (ColorPickerWPF.ColorPickerWindow.ShowDialog(out Color newColor, prevColor))
+            if (ColorPickerWPF.ColorPickerWindow.ShowDialog(out Color newColor, prevColor,
+                ColorPickerWPF.DialogOptions.SimpleView |
+                ColorPickerWPF.DialogOptions.LoadCustomPalette | 
+                ColorPickerWPF.DialogOptions.HuePicker) == true)
             {
                 //rect.Fill = new SolidColorBrush(dialog.Color);
                 rect.Fill = new SolidColorBrush(newColor);

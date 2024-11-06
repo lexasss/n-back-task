@@ -6,48 +6,40 @@
         xmlns:colorPickerWpf="clr-namespace:ColorPickerWPF"
         mc:Ignorable="d"
         Title="Color Picker"
-        WindowStartupLocation="CenterScreen"
         Width="574"
-        MinWidth="330"
         SizeToContent="Height"
-        MinHeight="390"
         Icon="Resources/icon.png"
+        WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
-    
-    <DockPanel LastChildFill="False">
 
-        <colorPickerWpf:ColorPickerControl x:Name="ColorPicker"
-                                           DockPanel.Dock="Top"/>
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Width" Value="85"/>
+            <Setter Property="Height" Value="27"/>
+            <Setter Property="Margin" Value="8"/>
+        </Style>
+    </Window.Resources>
+        
+    <Grid Margin="4,0">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <Grid DockPanel.Dock="Bottom">
+        <colorPickerWpf:ColorPickerControl x:Name="ColorPicker" Grid.Row="0"/>
+
+        <Grid x:Name="grdButtons" Grid.Row="1">
             <WrapPanel>
-                <Button x:Name="OKButton"
-                    Content="OK"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    Width="75"
-                    Height="27"
-                    Margin="4,10"
-                    IsDefault="True"
-                    Click="OKButton_Click" />
-                <Button x:Name="CloseButton"
-                    Content="Close"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    Width="75"
-                    Height="27"
-                    Margin="4,10"
-                    IsCancel="True"
-                    Click="CloseButton_Click"/>
+                <Button Content="OK"
+                        IsDefault="True"
+                        Click="OK_Click" />
+                <Button Content="Cancel"
+                        IsCancel="True"/>
             </WrapPanel>
-            <Button x:Name="MinMaxViewButton"
+            <Button x:Name="btnMinMaxView"
                     Content="&lt;&lt; Simple"
                     HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    Width="75"
-                    Height="27"
-                    Margin="4,10"
-                    Click="MinMaxViewButton_Click" />
+                    Click="MinMaxView_Click" />
         </Grid>
-    </DockPanel>
+    </Grid>
 </Window>

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media;
 
-namespace ColorPickerWPF.Code;
+namespace ColorPickerWPF;
 
 public class ColorSwatchItem
 {

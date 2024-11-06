@@ -1,5 +1,4 @@
-﻿using ColorPickerWPF.Code;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Media;
 
@@ -7,20 +6,18 @@ namespace ColorPickerWPF;
 
 public partial class ColorPickerWindow : Window
 {
-    protected readonly int WidthMax = 574;
-    protected readonly int WidthMin = 342;
-    protected bool SimpleMode { get; set; }
-
     public ColorPickerWindow()
     {
         InitializeComponent();
     }
     
-    public static bool ShowDialog(
-        out Color color, Color? seedColor = null, ColorPickerDialogOptions flags = ColorPickerDialogOptions.None,
-        ColorPickerControl.ColorPickerChangeHandler customPreviewEventHandler = null, Action<ColorPickerWindow> customiseWindow = null)
+    public static bool? ShowDialog(out Color color,
+        Color? seedColor = null,
+        DialogOptions flags = DialogOptions.None,
+        EventHandler<Color> colorPreview = null,
+        Action<ColorPickerWindow> customiseWindow = null)
     {
-        if ((flags & ColorPickerDialogOptions.LoadCustomPalette) == ColorPickerDialogOptions.LoadCustomPalette)
+        if ((flags & DialogOptions.LoadCustomPalette) == DialogOptions.LoadCustomPalette)
         {
             ColorPickerSettings.UsingCustomPalette = true;
         }
@@ -31,9 +28,14 @@ public partial class ColorPickerWindow : Window
 
         customiseWindow?.Invoke(instance);
 
-        if ((flags & ColorPickerDialogOptions.SimpleView) == ColorPickerDialogOptions.SimpleView)
+        if ((flags & DialogOptions.SimpleView) == DialogOptions.SimpleView)
         {
             instance.ToggleSimpleAdvancedView();
+        }
+
+        if ((flags & DialogOptions.HuePicker) == DialogOptions.HuePicker)
+        {
+            instance.ColorPicker.ShowHueTab();
         }
 
         if (ColorPickerSettings.UsingCustomPalette)
@@ -41,62 +43,46 @@ public partial class ColorPickerWindow : Window
             instance.ColorPicker.LoadDefaultCustomPalette();
         }
 
-        if (customPreviewEventHandler != null)
+        if (colorPreview != null)
         {
-            instance.ColorPicker.OnPickColor += customPreviewEventHandler;
+            instance.ColorPicker.ColorPicked += colorPreview;
         }
 
         var result = instance.ShowDialog();
-        if (result.HasValue && result.Value)
+        if (result == true)
         {
             color = instance.ColorPicker.Color;
-            return true;
         }
 
-        return false;
+        return result;
     }
 
-    private void OKButton_Click(object sender, RoutedEventArgs e)
-    {
-        DialogResult = true;
-        Hide();
-    }
+    // Internal
 
-    private void CloseButton_Click(object sender, RoutedEventArgs e)
-    {
-        DialogResult = false;
-        Hide();
-    }
+    const int WidthMax = 574;
+    const int WidthMin = 350;
 
-    private void MinMaxViewButton_Click(object sender, RoutedEventArgs e)
+    bool _simpleMode;
+
+    private void ToggleSimpleAdvancedView()
     {
-        if (SimpleMode)
+        if (_simpleMode)
         {
-            SimpleMode = false;
-            MinMaxViewButton.Content = "<< Simple";
+            _simpleMode = false;
+            btnMinMaxView.Content = "<< Simple";
             Width = WidthMax;
         }
         else
         {
-            SimpleMode = true;
-            MinMaxViewButton.Content = "Advanced >>";
+            _simpleMode = true;
+            btnMinMaxView.Content = "Advanced >>";
             Width = WidthMin;
         }
     }
 
-    public void ToggleSimpleAdvancedView()
-    {
-        if (SimpleMode)
-        {
-            SimpleMode = false;
-            MinMaxViewButton.Content = "<< Simple";
-            Width = WidthMax;
-        }
-        else
-        {
-            SimpleMode = true;
-            MinMaxViewButton.Content = "Advanced >>";
-            Width = WidthMin;
-        }
-    }
+    // UI
+
+    private void OK_Click(object sender, RoutedEventArgs e) => DialogResult = true;
+
+    private void MinMaxView_Click(object sender, RoutedEventArgs e) => ToggleSimpleAdvancedView();
 }

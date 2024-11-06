@@ -1,40 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Media;
+using System.Xml;
 using System.Xml.Serialization;
 
-namespace ColorPickerWPF.Code;
+namespace ColorPickerWPF;
 
 [Serializable]
 public class ColorPalette
 {
-    public List<ColorSwatchItem> BuiltInColors { get; set; }
+    public ColorSwatchItem[] BuiltInColors { get; set; } = [];
 
-    public List<ColorSwatchItem> CustomColors { get; set; }
-
-    [XmlIgnore]
-    protected const int NumColorsFirstSwatch = 39;
-
-    [XmlIgnore]
-    protected const int NumColorsCustomSwatch = 44;
-
-    [XmlIgnore]
-    protected const int NumColorsSecondSwatch = 112;
-
-    public ColorPalette()
-    {
-        BuiltInColors = new List<ColorSwatchItem>();
-        CustomColors = new List<ColorSwatchItem>();
-    }
+    public ColorSwatchItem[] CustomColors { get; set; } = [];
 
     public void InitializeDefaults()
     {
-        BuiltInColors.Clear();
-        BuiltInColors.AddRange(
-            GetColorSwatchItems(
-            new List<Color>()
-        {
+        BuiltInColors = GetColorSwatchItems([
             Colors.Black,
             Colors.Red,
             Colors.DarkOrange,
@@ -76,12 +59,14 @@ public class ColorPalette
             Colors.DarkViolet,
             Colors.Aquamarine,
             Colors.CornflowerBlue,
+
             Colors.Bisque,
             Colors.WhiteSmoke,
             Colors.AliceBlue,
 
             Color.FromArgb(255, 5, 5, 5),
-            Color.FromArgb(255, 15, 15, 15),Color.FromArgb(255, 35, 35, 35),
+            Color.FromArgb(255, 15, 15, 15),
+            Color.FromArgb(255, 35, 35, 35),
             Color.FromArgb(255, 55, 55, 55),
             Color.FromArgb(255, 75, 75, 75),
             Color.FromArgb(255, 95, 95, 95),
@@ -92,16 +77,68 @@ public class ColorPalette
             Color.FromArgb(255, 195, 195, 195),
             Color.FromArgb(255, 215, 215, 215),
             Color.FromArgb(255, 235, 235, 235),
-        }));
+        ]).ToArray();
 
-        CustomColors.Clear();
-        CustomColors.AddRange(Enumerable.Repeat(Colors.White, NumColorsCustomSwatch)
+        CustomColors = Enumerable.Repeat(Colors.White, NumColorsCustomSwatch)
             .Select(x => new ColorSwatchItem() { Color = x, HexString = x.ToHexString() })
-            .ToList());
+            .ToArray();
     }
 
-    protected List<ColorSwatchItem> GetColorSwatchItems(List<Color> colors)
+    public static ColorPalette LoadFromXml(string filename)
     {
-        return colors.Select(x => new ColorSwatchItem() { Color = x, HexString = x.ToHexString() }).ToList();
+        ColorPalette result = default;
+        if (File.Exists(filename))
+        {
+            var sr = new StreamReader(filename);
+            var xr = new XmlTextReader(sr);
+
+            var xmlSerializer = new XmlSerializer(typeof(ColorPalette));
+
+            result = (ColorPalette)xmlSerializer.Deserialize(xr);
+
+            xr.Close();
+            sr.Close();
+            xr.Dispose();
+            sr.Dispose();
+        }
+        return result;
     }
+
+    public void SaveToXml(string filename)
+    {
+        var xmlSerializer = new XmlSerializer(typeof(ColorPalette));
+
+        var sww = new StringWriter();
+
+        var settings = new XmlWriterSettings()
+        {
+            Indent = true,
+            IndentChars = "    ",
+            NewLineOnAttributes = false,
+            //OmitXmlDeclaration = true
+        };
+        var writer = XmlWriter.Create(sww, settings);
+
+        xmlSerializer.Serialize(writer, this);
+        var xml = sww.ToString();
+
+        writer.Close();
+        writer.Dispose();
+
+        File.WriteAllText(filename, xml);
+    }
+
+    // Internal
+
+    [XmlIgnore]
+    protected const int NumColorsFirstSwatch = 3 * 13;
+
+    [XmlIgnore]
+    protected const int NumColorsSecondSwatch = 3 + 13;
+
+    [XmlIgnore]
+    protected const int NumColorsCustomSwatch = 22;
+
+    private IEnumerable<ColorSwatchItem> GetColorSwatchItems(Color[] colors) =>
+        colors.Select(x => new ColorSwatchItem() { Color = x, HexString = x.ToHexString() });
 }

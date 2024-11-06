@@ -7,7 +7,13 @@
              mc:Ignorable="d"
              d:DesignWidth="560"
              d:DesignHeight="330"
-             MinHeight="330">
+             MinHeight="354">
+
+    <UserControl.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Resources>
     
     <Grid>
         <Grid.ColumnDefinitions>
@@ -21,44 +27,44 @@
         </Grid.RowDefinitions>
 
         <Grid>
-            <TabControl x:Name="TabControl"
-                        Margin="0,0,0,0">
-                <TabItem Header="Picker 1">
+            <TabControl x:Name="tbcTabs">
+                <TabItem Header="Rainbow">
                     <Grid>
-                        <Image x:Name="SampleImage"
+                        <Image x:Name="imgRainbow"
                                Source="pack://application:,,,/ColorPickerWPF;component/Resources/colorpicker1.png"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Top"
-                               Margin="0"
                                Width="320"
                                Height="240"
-                               MouseDown="SampleImage_OnMouseDown" />
+                               MouseDown="RainbowImage_MouseDown" />
                     </Grid>
                 </TabItem>
-                <TabItem Header="Picker 2" Selector.Selected="OnPicker2Selected" >
+                <TabItem Header="Hue" Selector.Selected="HueTab_Selected" >
                     <Grid>
-                        <Image x:Name="SampleImage2"
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Image x:Name="imgHue" Grid.Column="0"
                                Source="pack://application:,,,/ColorPickerWPF;component/Resources/colorpicker2.png"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Top"
                                Margin="2"
                                Width="254"
                                Height="254"
-                               MouseDown="SampleImage2_OnMouseDown" />
-                        <Label x:Name="label"
+                               MouseDown="HueImage_MouseDown" />
+                        <Label Grid.Column="1"
                                Content="Hue"
-                               HorizontalAlignment="Left"
-                               VerticalAlignment="Top"
-                               Margin="261,2,0,0"/>
-                        <Slider x:Name="PickerHueSlider"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Top"
-                                Margin="268,33,0,0"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Top"/>
+                        <Slider x:Name="sldPickerHue" Grid.Column="1"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Stretch"
+                                Margin="0,33,0,8"
                                 Orientation="Vertical"
-                                Height="199"
+                                Minimum="1"
                                 Maximum="360"
                                 SmallChange="1"
-                                Minimum="1"
                                 LargeChange="30"
                                 ValueChanged="PickerHueSlider_ValueChanged"/>
                     </Grid>
@@ -66,113 +72,81 @@
             </TabControl>
         </Grid>
 
-        <Grid Grid.Column="1" Grid.RowSpan="2">
-            <Label x:Name="rgbLabel"
-                   Content="Red, Green, Blue, Alpha"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Top" />
-            <colorPickerWpf:SliderRow x:Name="RSlider"
-                                      VerticalAlignment="Top"
-                                      Margin="0,26,0,0"
-                                      FormatString="F0"
-                                      OnValueChanged="RSlider_ValueChanged"/>
-            <colorPickerWpf:SliderRow x:Name="GSlider"
-                                      VerticalAlignment="Top"
-                                      Margin="0,54,0,0"
-                                      FormatString="F0"
-                                      OnValueChanged="GSlider_ValueChanged"/>
-            <colorPickerWpf:SliderRow x:Name="BSlider" 
-                                      VerticalAlignment="Top"
-                                      Margin="0,82,0,0"
-                                      FormatString="F0"
-                                      OnValueChanged="BSlider_ValueChanged" />
-            <colorPickerWpf:SliderRow x:Name="ASlider" 
-                                      VerticalAlignment="Top"
-                                      Margin="0,110,0,0"
-                                      FormatString="F0"
-                                      OnValueChanged="ASlider_ValueChanged"/>
+        <StackPanel Grid.Column="1" Grid.RowSpan="2">
+            <Label Content="Red, Green, Blue, Alpha"/>
+            <colorPickerWpf:SliderRow x:Name="sldR"
+                                        FormatString="F0"
+                                        ValueChanged="RSlider_ValueChanged"/>
+            <colorPickerWpf:SliderRow x:Name="sldG"
+                                        FormatString="F0"
+                                        ValueChanged="GSlider_ValueChanged"/>
+            <colorPickerWpf:SliderRow x:Name="sldB" 
+                                        FormatString="F0"
+                                        ValueChanged="BSlider_ValueChanged" />
+            <colorPickerWpf:SliderRow x:Name="slrA" 
+                                        FormatString="F0"
+                                        ValueChanged="ASlider_ValueChanged"/>
+            <Separator Margin="4"/>
+            <Label Content="Hue, Saturation, Value"/>
+            <colorPickerWpf:SliderRow x:Name="sldH"
+                                        FormatString="F0"
+                                        ValueChanged="HSlider_ValueChanged"/>
+            <colorPickerWpf:SliderRow x:Name="sldS"
+                                        ValueChanged="SSlider_ValueChanged" />
+            <colorPickerWpf:SliderRow x:Name="sldL" 
+                                        ValueChanged="LSlider_ValueChanged" />
 
-            <Label x:Name="hsvLabel"
-                   Content="Hue, Saturation, Value"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Top"
-                   Margin="0,143,0,0"/>
-            <colorPickerWpf:SliderRow x:Name="HSlider"
-                                      VerticalAlignment="Top"
-                                      Margin="0,169,0,0" 
-                                      FormatString="F0"
-                                      OnValueChanged="HSlider_ValueChanged"/>
-            <colorPickerWpf:SliderRow x:Name="SSlider"
-                                      VerticalAlignment="Top"
-                                      Margin="0,197,0,0"
-                                      OnValueChanged="SSlider_ValueChanged" />
-            <colorPickerWpf:SliderRow x:Name="LSlider" 
-                                      VerticalAlignment="Top"
-                                      Margin="0,225,0,0"
-                                      OnValueChanged="LSlider_ValueChanged" />
-            <colorPickerWpf:ColorPickerSwatch x:Name="CustomColorSwatch"
-                                              HorizontalAlignment="Left"
-                                              Margin="4,312,0,0"
-                                              Width="230"
-                                              Editable="true"
-                                              OnPickColor="Swatch_PickColor" />
-            <Grid HorizontalAlignment="Left"
-                  Margin="4,258,0,0"
-                  VerticalAlignment="Top"
-                  Width="230">
+            <Separator Margin="4"/>
+                
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="35" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="105" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <Label Content="Hex:"
-                       HorizontalAlignment="Left"
-                       Margin="0,2,0,0" />
-                <TextBox x:Name="HexBox" Grid.Column="2"
-                         HorizontalAlignment="Left"
-                         Height="23"
-                         Margin="0,5,0,0"
-                         TextWrapping="Wrap"
-                         Text="000000"
-                         VerticalAlignment="Top"
-                         Width="100"
-                         TextChanged="HexBox_TextChanged" />
+                        VerticalAlignment="Center"/>
+                <TextBox x:Name="txbHexValue" Grid.Column="2"
+                            Height="23"
+                            Margin="3,0"
+                            TextWrapping="Wrap"
+                            Text="#000000"
+                            Width="57"
+                            TextChanged="HexValue_TextChanged" />
             </Grid>
-            <Label x:Name="customColorsLabel"
-                   Content="Custom Colors (Ctrl+Click to set)"
-                   HorizontalAlignment="Left"
-                   Margin="0,281,0,0"
-                   VerticalAlignment="Top" />
-        </Grid>
+
+            <Separator Margin="4,4,4,2"/>
+            
+            <Label x:Name="lblCustomColors"
+                   Content="Custom Colors (Ctrl+Click to set)"/>
+
+            <colorPickerWpf:ColorPickerSwatch x:Name="swtCustomColors"
+                                              Editable="true"
+                                              ColorPicked="Swatch_ColorPicked" />
+        </StackPanel>
 
         <Grid Grid.Row="1" Grid.Column="0" Margin="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="60" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <Border x:Name="ColorDisplayBorder"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        BorderBrush="Black"
-                        Background="White"
-                        BorderThickness="2" 
-                        Width="58"
-                        Height="58"
-                        Margin="0,0,0,0" />
+            
+            <Border x:Name="brdColorDisplay" Grid.Row="0" Grid.Column="0"
+                    BorderBrush="Black"
+                    Background="White"
+                    BorderThickness="2"
+                    Margin="0,0,2,2"/>
 
-                <colorPickerWpf:ColorPickerSwatch x:Name="Swatch1"
-                                                  HorizontalAlignment="Left"
-                                                  VerticalAlignment="Top"
-                                                  Height="60"
-                                                  Width="260"
-                                                  Margin="60,0,0,0"
-                                                  OnPickColor="Swatch_PickColor" />
-            </Grid>
-            <colorPickerWpf:ColorPickerSwatch x:Name="Swatch2" Grid.Row="1"
-                                              Margin="0,0,0,0"
-                                              OnPickColor="Swatch_PickColor" />
+            <colorPickerWpf:ColorPickerSwatch x:Name="swtSwatch1" Grid.Row="0" Grid.Column="1"
+                                              ColorPicked="Swatch_ColorPicked" />
+
+            <colorPickerWpf:ColorPickerSwatch x:Name="swtSwatch2" Grid.Row="1" Grid.ColumnSpan="2"
+                                              ColorPicked="Swatch_ColorPicked" />
         </Grid>
     </Grid>
 </UserControl>

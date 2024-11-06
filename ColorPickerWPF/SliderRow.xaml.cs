@@ -1,13 +1,12 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace ColorPickerWPF;
 
 public partial class SliderRow : UserControl
 {
-    public delegate void SliderRowValueChangedHandler(double value);
-
-    public event SliderRowValueChangedHandler OnValueChanged;
+    public event EventHandler<double> ValueChanged;
 
     public string FormatString { get; set; }
 
@@ -20,7 +19,7 @@ public partial class SliderRow : UserControl
         InitializeComponent();
     }
 
-    private void Slider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         // Set textbox
         var value = Slider.Value;
@@ -29,12 +28,12 @@ public partial class SliderRow : UserControl
         {
             UpdatingValues = true;
             TextBox.Text = value.ToString(FormatString);
-            OnValueChanged?.Invoke(value);
+            ValueChanged?.Invoke(this, value);
             UpdatingValues = false;
         }
     }
 
-    private void TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+    private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (!UpdatingValues)
         {
@@ -45,7 +44,7 @@ public partial class SliderRow : UserControl
             {
                 UpdatingValues = true;
                 Slider.Value = parsedValue;
-                OnValueChanged?.Invoke(parsedValue);
+                ValueChanged?.Invoke(this, parsedValue);
                 UpdatingValues = false;
             }
         }
