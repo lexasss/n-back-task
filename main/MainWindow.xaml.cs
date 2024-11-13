@@ -167,8 +167,8 @@ public partial class MainWindow : Window
             label.Background = _settings.StimulusColor;
             label.Foreground = _settings.StimulusFontColor;
 
-            label.TouchDown += Stimulus_TouchDown;
-            label.TouchUp += Stimulus_TouchUp;
+            border.PreviewTouchDown += Stimulus_TouchDown;
+            border.PreviewTouchUp += Stimulus_TouchUp;
             label.MouseDown += Stimulus_MouseDown;
             label.MouseUp += Stimulus_MouseUp;
 
@@ -301,7 +301,10 @@ public partial class MainWindow : Window
         if (_settings.InputMode != InputMode.Touch)
             return;
 
-        if (sender is not Label lbl)
+        if (sender is not Border brd)
+            return;
+
+        if (brd.Child is not Label lbl)
             return;
 
         Stimulus? stimulus = lbl.Tag as Stimulus;
@@ -318,7 +321,10 @@ public partial class MainWindow : Window
         if (_settings.InputMode != InputMode.Touch)
             return;
 
-        if (sender is not Label lbl)
+        if (sender is not Border brd)
+            return;
+
+        if (brd.Child is not Label lbl)
             return;
 
         lbl.Background = _settings.StimulusColor;
