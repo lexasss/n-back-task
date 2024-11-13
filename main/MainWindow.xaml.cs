@@ -38,6 +38,24 @@ public partial class MainWindow : Window
 
     CancellationTokenSource _cts = new();
 
+    bool _windowWasMaximized = false;
+
+    private void SetFullScreen(bool isFullScreen)
+    {
+        if (isFullScreen)
+        {
+            _windowWasMaximized = WindowState == WindowState.Maximized;
+        }
+
+        WindowState = WindowState.Normal;
+        WindowStyle = isFullScreen ? WindowStyle.None : WindowStyle.SingleBorderWindow;
+        Topmost = isFullScreen;
+
+        WindowState = _windowWasMaximized || isFullScreen ? WindowState.Maximized : WindowState.Normal;
+
+        tblInstructions.Visibility = isFullScreen ? Visibility.Hidden : Visibility.Visible;
+    }
+
     private void DisplayInfo(string info, int delay = 0)
     {
         _cts.Cancel();
@@ -237,7 +255,8 @@ public partial class MainWindow : Window
         Dispatcher.Invoke(() =>
         {
             grdSetup.Visibility = Visibility.Hidden;
-            tblInstructions.Visibility = Visibility.Visible;
+
+            SetFullScreen(false);
 
             DisplayInfo("Finished!");
             DisplayInfo("Press ENTER to start", 2000);
@@ -314,7 +333,7 @@ public partial class MainWindow : Window
         {
             if (!_procedure.IsRunning)
             {
-                tblInstructions.Visibility = Visibility.Hidden;
+                SetFullScreen(true);
                 _procedure.Run(_settings.SetupIndex);
             }
         }
@@ -325,7 +344,8 @@ public partial class MainWindow : Window
                 _procedure.Stop();
 
                 grdSetup.Visibility = Visibility.Hidden;
-                tblInstructions.Visibility = Visibility.Visible;
+
+                SetFullScreen(false);
 
                 DisplayInfo("Interrupted");
                 DisplayInfo("Press ENTER to start", 2000);

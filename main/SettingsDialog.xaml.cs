@@ -26,17 +26,24 @@ public partial class SettingsDialog : Window
     {
         if (sender is Button btn && btn.Content is Rectangle rect)
         {
-            // Use solution from https://github.com/DRKV333/ColorPickerWPF
-            var prevColor = (rect.Fill as SolidColorBrush)?.Color ?? Colors.White;
-            //var dialog = new Egorozh.ColorPicker.Dialog.ColorPickerDialog() { Color = (rect.Fill as SolidColorBrush)?.Color ?? Colors.White };
-            //if (dialog.ShowDialog() == true)
-            if (ColorPickerWPF.ColorPickerWindow.ShowDialog(out Color newColor, prevColor,
-                ColorPickerWPF.DialogOptions.SimpleView |
-                ColorPickerWPF.DialogOptions.LoadCustomPalette | 
-                ColorPickerWPF.DialogOptions.HuePicker) == true)
+            if (new Random().NextDouble() < 0.5)
             {
-                //rect.Fill = new SolidColorBrush(dialog.Color);
-                rect.Fill = new SolidColorBrush(newColor);
+                var prevColor = (rect.Fill as SolidColorBrush)?.Color ?? Colors.White;
+                if (ColorPickerWPF.ColorPickerWindow.ShowDialog(out Color newColor, prevColor,
+                    ColorPickerWPF.DialogOptions.SimpleView |
+                    ColorPickerWPF.DialogOptions.LoadCustomPalette |
+                    ColorPickerWPF.DialogOptions.HuePicker) == true)
+                {
+                    rect.Fill = new SolidColorBrush(newColor);
+                }
+            }
+            else
+            {
+                var dialog = new Egorozh.ColorPicker.Dialog.ColorPickerDialog() { Color = (rect.Fill as SolidColorBrush)?.Color ?? Colors.White };
+                if (dialog.ShowDialog() == true)
+                {
+                    rect.Fill = new SolidColorBrush(dialog.Color);
+                }
             }
         }
     }
