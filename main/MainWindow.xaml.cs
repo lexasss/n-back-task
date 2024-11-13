@@ -49,7 +49,6 @@ public partial class MainWindow : Window
 
         WindowState = WindowState.Normal;
         WindowStyle = isFullScreen ? WindowStyle.None : WindowStyle.SingleBorderWindow;
-        Topmost = isFullScreen;
 
         WindowState = _windowWasMaximized || isFullScreen ? WindowState.Maximized : WindowState.Normal;
 
@@ -131,7 +130,7 @@ public partial class MainWindow : Window
         grdSetup.HorizontalAlignment = setup.Alignment;
         grdSetup.VerticalAlignment = setup.Alignment == HorizontalAlignment.Stretch ? VerticalAlignment.Stretch : VerticalAlignment.Center;
 
-        _fontSizeController.StimulusSize = setup.Stimuli[0].Size;
+        _fontSizeController.SetStimulusSize(_settings.StimulusUnstretchedSize);
         _fontSizeController.RowsInLayout = setup.RowCount;
 
         for (int i = 0; i < setup.Stimuli.Length; i++)
@@ -160,15 +159,15 @@ public partial class MainWindow : Window
 
             if (setup.Alignment != HorizontalAlignment.Stretch)
             {
-                border.Width = stimulus.Size;
-                border.Height = stimulus.Size;
+                border.Width = _settings.StimulusUnstretchedSize;
+                border.Height = _settings.StimulusUnstretchedSize;
             }
 
             label.Background = _settings.StimulusColor;
             label.Foreground = _settings.StimulusFontColor;
 
-            border.PreviewTouchDown += Stimulus_TouchDown;
-            border.PreviewTouchUp += Stimulus_TouchUp;
+            label.TouchDown += Stimulus_TouchDown;
+            label.TouchUp += Stimulus_TouchUp;
             label.MouseDown += Stimulus_MouseDown;
             label.MouseUp += Stimulus_MouseUp;
 
@@ -188,19 +187,25 @@ public partial class MainWindow : Window
         Background = _settings.ScreenColor;
         grdSetup.Background = _settings.ActiveScreenColor;
 
-        foreach (Border el in _stimuliElements)
-        {
-            el.BorderBrush = _settings.StimulusFontColor;
-            el.BorderThickness = new Thickness(_settings.StimulusBorderThickness);
-            el.Margin = new Thickness(_settings.StimulusGap / 2);
+        var setup = _procedure.Setups[_settings.SetupIndex];
+        _fontSizeController.SetStimulusSize(_settings.StimulusUnstretchedSize);
 
-            if (el.Child is Label label)
+        foreach (Border border in _stimuliElements)
+        {
+            border.BorderBrush = _settings.StimulusFontColor;
+            border.BorderThickness = new Thickness(_settings.StimulusBorderThickness);
+            border.Margin = new Thickness(_settings.StimulusGap / 2);
+
+            if (border.Child is Label label)
             {
                 label.Background = _settings.StimulusColor;
                 label.Foreground = _settings.StimulusFontColor;
-                label.Width = _settings.StimulusUnstretchedSize;
-                label.Height = _settings.StimulusUnstretchedSize;
-                label.FontSize = Math.Min(180, _settings.StimulusUnstretchedSize - 10);
+            }
+
+            if (setup.Alignment != HorizontalAlignment.Stretch)
+            {
+                border.Width = _settings.StimulusUnstretchedSize;
+                border.Height = _settings.StimulusUnstretchedSize;
             }
         }
     }
@@ -301,10 +306,7 @@ public partial class MainWindow : Window
         if (_settings.InputMode != InputMode.Touch)
             return;
 
-        if (sender is not Border brd)
-            return;
-
-        if (brd.Child is not Label lbl)
+        if (sender is not Label lbl)
             return;
 
         Stimulus? stimulus = lbl.Tag as Stimulus;
@@ -321,10 +323,7 @@ public partial class MainWindow : Window
         if (_settings.InputMode != InputMode.Touch)
             return;
 
-        if (sender is not Border brd)
-            return;
-
-        if (brd.Child is not Label lbl)
+        if (sender is not Label lbl)
             return;
 
         lbl.Background = _settings.StimulusColor;
