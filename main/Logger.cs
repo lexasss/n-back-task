@@ -18,7 +18,7 @@ internal class Logger
 
     public void Add(params object[] items)
     {
-        var timestamp = (DateTime.Now.Ticks - _startTime) / 10000;
+        var timestamp = DateTime.Now.Ticks;
         var record = string.Join('\t', [timestamp, ..items]);
 
         lock (_records)
