@@ -17,8 +17,7 @@ internal class Logger
 
     public void Add(params object[] items)
     {
-        var timestamp = DateTime.Now.Ticks;
-        var record = string.Join('\t', [timestamp, ..items]);
+        var record = string.Join('\t', [DateTime.Now.Ticks, ..items]);
 
         lock (_records)
         {
