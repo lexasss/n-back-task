@@ -28,6 +28,8 @@ internal class Procedure
 
         _player.CheckSoundsExist(audioFilenames.ToArray());
 
+        _server.Start();
+
         Application.Current.Exit += (s, e) => SaveSetups();
     }
 
@@ -78,6 +80,7 @@ internal class Procedure
         {
             stimulus.WasActivated = true;
             _logger.Add("stimulus", "activated", stimulus.Text);
+            _server.Send($"A {stimulus.Text}");
             System.Diagnostics.Debug.WriteLine($"Activated: {stimulus.Text}");
         }
 
@@ -135,6 +138,8 @@ internal class Procedure
     readonly Settings _settings = Settings.Instance;
     readonly Random _random = new();
     readonly List<Setup> _setups = [];
+
+    readonly TcpServer _server = new();
 
     State _state = State.Inactive;
     int[] _targetIndexes = [];
@@ -230,9 +235,11 @@ internal class Procedure
             _logger.Add("stimuli", "displayed");
 
             var stimulus = CurrentSetup.Stimuli[_targetIndexes[_trialIndex]];
-            var sound = stimulus?.AudioInstruction;
-            if (sound != null)
+            if (stimulus != null)
             {
+                _server.Send($"S {stimulus.Text}");
+
+                var sound = stimulus.AudioInstruction;
                 _player.Play(sound);
             }
 
