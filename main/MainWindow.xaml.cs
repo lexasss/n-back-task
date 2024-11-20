@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace NBackTask;
 
@@ -23,6 +24,7 @@ public partial class MainWindow : Window
         _procedure.StimuliShown += Procedure_StimuliShown;
         _procedure.StimuliHidden += Procedure_StimuliHidden;
         _procedure.Finished += Procedure_Finished;
+        _procedure.ConnectionStatusChanged += Procedure_ConnectionStatusChanged;
 
         LoadSetup(0);
     }
@@ -32,6 +34,9 @@ public partial class MainWindow : Window
     readonly Procedure _procedure = new();
     readonly Random _random = new();
     readonly Settings _settings = Settings.Instance;
+
+    readonly ImageSource _tcpOnImage = new BitmapImage(new Uri("pack://application:,,,/Assets/images/tcp-on.png"));
+    readonly ImageSource _tcpOffImage = new BitmapImage(new Uri("pack://application:,,,/Assets/images/tcp-off.png"));
 
     readonly List<UIElement> _stimuliElements = [];
     readonly FontSizeController _fontSizeController;
@@ -53,6 +58,7 @@ public partial class MainWindow : Window
         WindowState = _windowWasMaximized || isFullScreen ? WindowState.Maximized : WindowState.Normal;
 
         tblInstructions.Visibility = isFullScreen ? Visibility.Hidden : Visibility.Visible;
+        imgTcpClient.Visibility = isFullScreen ? Visibility.Hidden : Visibility.Visible;
     }
 
     private void DisplayInfo(string info, int delay = 0)
@@ -266,6 +272,11 @@ public partial class MainWindow : Window
             DisplayInfo("Finished!");
             DisplayInfo("Press ENTER to start", 2000);
         });
+    }
+
+    private void Procedure_ConnectionStatusChanged(object? sender, bool e)
+    {
+        imgTcpClient.Source = e ? _tcpOnImage : _tcpOffImage;
     }
 
     // UI

@@ -13,6 +13,12 @@
         Icon="/assets/images/icon.png">
     
     <Grid x:Name="grdContainer">
+        <Image x:Name="imgTcpClient"
+               Source="/assets/images/tcp-off.png" 
+               Width="32"
+               Margin="8"
+               VerticalAlignment="Bottom"
+               HorizontalAlignment="Left"/>
         <TextBlock x:Name="tblInstructions"
                    HorizontalAlignment="Right"
                    VerticalAlignment="Bottom"

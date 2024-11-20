@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <None Remove="assets\images\delete.png" />
+    <None Remove="assets\images\tcp-off.png" />
+    <None Remove="assets\images\tcp-on.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,6 +43,8 @@
   <ItemGroup>
     <Resource Include="assets\images\delete.png" />
     <Resource Include="assets\images\icon.png" />
+    <Resource Include="assets\images\tcp-off.png" />
+    <Resource Include="assets\images\tcp-on.png" />
   </ItemGroup>
 
   <ItemGroup>

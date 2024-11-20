@@ -14,6 +14,7 @@ internal class Procedure
     public event EventHandler? StimuliShown;
     public event EventHandler<bool?>? StimuliHidden;
     public event EventHandler? Finished;
+    public event EventHandler<bool>? ConnectionStatusChanged;
 
     public Procedure()
     {
@@ -28,6 +29,8 @@ internal class Procedure
 
         _player.CheckSoundsExist(audioFilenames.ToArray());
 
+        _server.ClientConnected += (s, e) => ConnectionStatusChanged?.Invoke(this, true);
+        _server.ClientDisconnected += (s, e) => ConnectionStatusChanged?.Invoke(this, false);
         _server.Start();
 
         Application.Current.Exit += (s, e) => SaveSetups();
