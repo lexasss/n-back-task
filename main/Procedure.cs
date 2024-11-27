@@ -49,6 +49,8 @@ internal class Procedure
         _logger.Reset();
         _logger.Add("experiment", "start", CurrentSetup.Name);
 
+        _server.Send($"STR");
+
         _targetIndexes = PrepareTargets(CurrentSetup);
 
         _trialIndex = -1;
@@ -83,7 +85,7 @@ internal class Procedure
         {
             stimulus.WasActivated = true;
             _logger.Add("stimulus", "activated", stimulus.Text);
-            _server.Send($"A {stimulus.Text}");
+            _server.Send($"ACT {stimulus.Text}");
             System.Diagnostics.Debug.WriteLine($"Activated: {stimulus.Text}");
         }
 
@@ -220,10 +222,12 @@ internal class Procedure
             _timer.Interval = Math.Max(1, _settings.BlankScreenDuration);
             _timer.Start();
 
-            _logger.Add("stimuli", "target", CurrentSetup.Stimuli[_targetIndexes[_trialIndex]]?.Text ?? "?");
+            var stimulus = CurrentSetup.Stimuli[_targetIndexes[_trialIndex]];
+            _logger.Add("stimuli", "target", stimulus?.Text ?? "?");
 
             if (_settings.InfoDuration == 0 && _settings.BlankScreenDuration > 0)
             {
+                _server.Send($"HID {stimulus?.Text}");
                 StimuliHidden?.Invoke(this, null);
             }
             NextTrial?.Invoke(this, CurrentSetup);
@@ -240,7 +244,7 @@ internal class Procedure
             var stimulus = CurrentSetup.Stimuli[_targetIndexes[_trialIndex]];
             if (stimulus != null)
             {
-                _server.Send($"S {stimulus.Text}");
+                _server.Send($"SET {stimulus.Text}");
 
                 var sound = stimulus.AudioInstruction;
                 _player.Play(sound);
@@ -259,6 +263,8 @@ internal class Procedure
             _logger.Add("stimuli", "hidden");
             _logger.Add("experiment", "result", isCorrect ? "success" : "failure");
 
+            _server.Send($"RES {stimulus?.Text} {isCorrect}");
+
             if (_settings.InfoDuration > 0)
             {
                 StimuliHidden?.Invoke(this, isCorrect);
@@ -269,6 +275,7 @@ internal class Procedure
         {
             CurrentSetup = null;
 
+            _server.Send($"FIN");
             _logger.Add("experiment", "stop");
         }
     }
