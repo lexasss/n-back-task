@@ -15,6 +15,7 @@ public partial class MainWindow : Window
         Background = _settings.ScreenColor;
         grdSetup.Background = _settings.ActiveScreenColor;
         grdSetup.Visibility = Visibility.Hidden;
+        wplButtons.Visibility = Visibility.Hidden;
 
         _fontSizeController = new FontSizeController(this);
 
@@ -43,6 +44,7 @@ public partial class MainWindow : Window
 
     CancellationTokenSource _cts = new();
 
+    bool _isDebugMode = false;
     bool _windowWasMaximized = false;
 
     private void SetFullScreen(bool isFullScreen)
@@ -216,6 +218,18 @@ public partial class MainWindow : Window
         }
     }
 
+    private void StartProcedure()
+    {
+        if (!_procedure.IsRunning)
+        {
+            if (_isDebugMode)
+                wplButtons.Visibility = Visibility.Hidden;
+
+            SetFullScreen(true);
+            _procedure.Run(_settings.SetupIndex);
+        }
+    }
+
     // Event handlers
 
     private void Procedure_NextTrial(object? sender, Setup setup)
@@ -266,6 +280,9 @@ public partial class MainWindow : Window
         Dispatcher.Invoke(() =>
         {
             grdSetup.Visibility = Visibility.Hidden;
+
+            if (_isDebugMode)
+                wplButtons.Visibility = Visibility.Visible;
 
             SetFullScreen(false);
 
@@ -347,11 +364,7 @@ public partial class MainWindow : Window
     {
         if (e.Key == Key.Enter)
         {
-            if (!_procedure.IsRunning)
-            {
-                SetFullScreen(true);
-                _procedure.Run(_settings.SetupIndex);
-            }
+            StartProcedure();
         }
         else if (e.Key == Key.Escape)
         {
@@ -360,6 +373,9 @@ public partial class MainWindow : Window
                 _procedure.Stop();
 
                 grdSetup.Visibility = Visibility.Hidden;
+
+                if (_isDebugMode)
+                    wplButtons.Visibility = Visibility.Visible;
 
                 SetFullScreen(false);
 
@@ -387,10 +403,18 @@ public partial class MainWindow : Window
         {
             if (!_procedure.IsRunning)
             {
+                _isDebugMode = !_isDebugMode;
+                wplButtons.Visibility = _isDebugMode ? Visibility.Visible : Visibility.Hidden;
+            }
+        }
+        else if (e.Key == Key.F5)
+        {
+            if (!_procedure.IsRunning)
+            {
                 _settings.ShowDialog();
             }
         }
-        else if (e.Key == Key.F3)
+        else if (e.Key == Key.F6)
         {
             if (!_procedure.IsRunning)
             {
@@ -405,5 +429,27 @@ public partial class MainWindow : Window
     private void Window_Closed(object sender, EventArgs e)
     {
         _settings.Save();
+    }
+
+    private void SetupButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_procedure.IsRunning)
+        {
+             if (int.TryParse((sender as Button)?.Content.ToString(), out int setupIndex))
+                LoadSetup(setupIndex - 1);
+        }
+    }
+
+    private void MenuButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_procedure.IsRunning)
+        {
+            _settings.ShowDialog();
+        }
+    }
+
+    private void StartButton_Click(object sender, RoutedEventArgs e)
+    {
+        StartProcedure();
     }
 }

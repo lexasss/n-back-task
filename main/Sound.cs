@@ -25,7 +25,12 @@ internal class Sound
 
     public Sound(string filename, string name, string deviceName = "")
     {
-        _mp3 = new Mp3FileReader(filename);
+        if (filename.ToLower().EndsWith(".mp3"))
+            _sound = new Mp3FileReader(filename);
+        else if (filename.ToLower().EndsWith(".wav"))
+            _sound = new WaveFileReader(filename);
+        else
+            _sound = new AudioFileReader(filename);
 
         Name = name;
 
@@ -34,7 +39,7 @@ internal class Sound
             SetDevice(deviceName);
         }
 
-        _player.Init(_mp3);
+        _player.Init(_sound);
         _player.PlaybackStopped += OnPlaybackStopped;
     }
 
@@ -42,34 +47,28 @@ internal class Sound
     /// Plays the sound
     /// </summary>
     /// <param name="cyclic">True if the sound will play in a loop and will be stopped externally, otherwise it will stop automatically after playing the sound once</param>
-    /// <returns>Self to chain with <see cref="Chain(Action)"/> if needed</returns>
-    public Sound Play(bool cyclic = false)
+    /// <param name="volume">Playback volume, 0..1</param>
+    /// <returns>Self. Could be useful when creating a chain of calls with <see cref="Chain(Action)"/></returns>
+    public Sound Play(bool cyclic = false, float volume = -1)
     {
         _cyclic = cyclic;
-        _player.Volume = 1;
-        _player.Play();
-        //Utils.DispatchOnce.Do(0.05, () => _player.Play());
 
-        return this;
-    }
+        if (volume >= 0 && volume <= 1)
+        {
+            _player.Volume = volume;
+        }
 
-    public Sound Play(float volume)
-    {
-        _player.Volume = volume;
-        _player.Play();
-        //Utils.DispatchOnce.Do(0.05, () => _player.Play());
-
-        return this;
-    }
-
-    public Sound PlayASAP()
-    {
-        _cyclic = false;
-        _player.Volume = 1;
         _player.Play();
 
         return this;
     }
+
+    /// <summary>
+    /// Plays the sound once
+    /// </summary>
+    /// <param name="volume">Playback volume, 0..1</param>
+    /// <returns>Self. Could be useful when creating a chain of calls with <see cref="Chain(Action)"/></returns>
+    public Sound Play(float volume) => Play(false, volume);
 
     /// <summary>
     /// Registers a callback to execute after the playback stops automatically.
@@ -97,7 +96,7 @@ internal class Sound
     // Internal
 
     readonly WaveOut _player = new();
-    readonly Mp3FileReader _mp3;
+    readonly WaveStream _sound;
 
     readonly List<Action> _onFinished = [];
 
@@ -105,7 +104,7 @@ internal class Sound
 
     private void OnPlaybackStopped(object? sender, StoppedEventArgs e)
     {
-        _mp3.Seek(0, SeekOrigin.Begin);
+        _sound.Seek(0, SeekOrigin.Begin);
 
         if (_cyclic)
         {
@@ -152,7 +151,10 @@ internal class Player
     public static string SoundsFolder => "assets/sounds";
     public static string AudioType => "mp3";
 
-    public static int NumberOfInstructions => Directory.GetFiles(SoundsFolder, $"*.{AudioType}").Length;
+    public static int NumberOfInstructions => Directory
+        .GetFiles(SoundsFolder, $"*.{AudioType}")
+        .Where(filename => int.TryParse(Path.GetFileNameWithoutExtension(filename), out int id) && id > 0 && id < 10)
+        .Count();
 
     public Player()
     {
@@ -189,7 +191,7 @@ internal class Player
 
     public void Play(string name)
     {
-        _sounds[name].Play();
+        _sounds[name].Play(1);
     }
 
     // Internal

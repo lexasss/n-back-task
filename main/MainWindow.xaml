@@ -11,6 +11,18 @@
         Width="800"
         Closed="Window_Closed"
         Icon="/assets/images/icon.png">
+
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Width" Value="48"/>
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="FontSize" Value="24"/>
+        </Style>
+        <Style x:Key="Setup" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Foreground" Value="RoyalBlue"/>
+            <EventSetter Event="Click" Handler="SetupButton_Click"/>
+        </Style>
+    </Window.Resources>
     
     <Grid x:Name="grdContainer">
         <Image x:Name="imgTcpClient"
@@ -23,17 +35,40 @@
                    HorizontalAlignment="Right"
                    VerticalAlignment="Bottom"
                    Margin="8">
-            <Run>F2 - Settings</Run>
+            <Run>F5 - Settings</Run>
             <LineBreak/>
-            <Run>F3 - Setup editor</Run>
+            <Run>F6 - Setup editor</Run>
             <LineBreak/>
-            <Run>1-5 - Select a setup</Run>
+            <Run>1-9 - Select a setup</Run>
         </TextBlock>
-        <Label x:Name="lblInfo"
-               FontSize="42"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center"
-               Content="Press ENTER to start"/>
+        <Grid HorizontalAlignment="Center"
+              VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Label x:Name="lblInfo" Grid.Row="0"
+                   FontSize="42"
+                   Content="Press ENTER to start"
+                   HorizontalContentAlignment="Center"/>
+            <WrapPanel x:Name="wplButtons" Grid.Row="1">
+                <Button Content="≡"
+                        Click="MenuButton_Click"/>
+                <Separator Margin="8"/>
+                <Button Style="{StaticResource Setup}" Content="1"/>
+                <Button Style="{StaticResource Setup}" Content="2"/>
+                <Button Style="{StaticResource Setup}" Content="3"/>
+                <Button Style="{StaticResource Setup}" Content="4"/>
+                <Button Style="{StaticResource Setup}" Content="5"/>
+                <Button Style="{StaticResource Setup}" Content="6"/>
+                <Button Style="{StaticResource Setup}" Content="7"/>
+                <Button Style="{StaticResource Setup}" Content="8"/>
+                <Button Style="{StaticResource Setup}" Content="9"/>
+                <Separator Margin="8"/>
+                <Button Content="▶"
+                        Click="StartButton_Click"/>
+            </WrapPanel>
+        </Grid>
         <Grid x:Name="grdSetup">
             <!-- to be filled in code -->
         </Grid>

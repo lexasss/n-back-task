@@ -33,7 +33,18 @@ internal class Procedure
         _server.ClientDisconnected += (s, e) => ConnectionStatusChanged?.Invoke(this, false);
         _server.Start();
 
-        Application.Current.Exit += (s, e) => SaveSetups();
+        try
+        {
+            _backgroundSound = new("assets/sounds/noise.mp3", "background");
+            _backgroundSound.Play(true);
+        }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
+
+        Application.Current.Exit += (s, e) =>
+        {
+            _backgroundSound?.Stop();
+            SaveSetups();
+        };
     }
 
     public void Run(int setupIndex)
@@ -143,6 +154,7 @@ internal class Procedure
     readonly Settings _settings = Settings.Instance;
     readonly Random _random = new();
     readonly List<Setup> _setups = [];
+    readonly Sound? _backgroundSound;
 
     readonly TcpServer _server = new();
 
@@ -150,7 +162,7 @@ internal class Procedure
     int[] _targetIndexes = [];
     int _trialIndex = -1;
 
-    public List<Setup> LoadSetups()
+    private List<Setup> LoadSetups()
     {
         var setups = new List<Setup>();
 
