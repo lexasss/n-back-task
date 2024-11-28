@@ -7,13 +7,13 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>assets\icon.ico</ApplicationIcon>
     <Authors>Oleg Spakov</Authors>
     <Company>Tampere University</Company>
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://github.com/lexasss/n-back-task/releases/</PackageProjectUrl>
     <Copyright>Oleg Spakov @ 2024</Copyright>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile></PackageReadmeFile>
     <RepositoryUrl>https://github.com/lexasss/n-back-task/</RepositoryUrl>
   </PropertyGroup>
 
@@ -37,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="icon.ico" />
+    <Content Include="assets\icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,13 +49,6 @@
 
   <ItemGroup>
     <Folder Include="assets\sounds\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
