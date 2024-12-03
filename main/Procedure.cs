@@ -227,9 +227,10 @@ internal class Procedure
             Finished?.Invoke(this, EventArgs.Empty);
 
             var filename = _logger.Save();
-            if (filename != null)
+            if (filename == null)
             {
-                MessageBox.Show($"Data saved to '{filename}'", App.Name, MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Failed to save data!", App.Name, MessageBoxButton.OK, MessageBoxImage.Error);
+                //MessageBox.Show($"Data saved to '{filename}'", App.Name, MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }
