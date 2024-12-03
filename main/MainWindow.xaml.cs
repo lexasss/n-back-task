@@ -21,6 +21,7 @@ public partial class MainWindow : Window
 
         _settings.Updated += (s, e) => UpdateStimuli();
 
+        _procedure.Started += Procedure_Started;
         _procedure.NextTrial += Procedure_NextTrial;
         _procedure.StimuliShown += Procedure_StimuliShown;
         _procedure.StimuliHidden += Procedure_StimuliHidden;
@@ -218,19 +219,15 @@ public partial class MainWindow : Window
         }
     }
 
-    private void StartProcedure()
-    {
-        if (!_procedure.IsRunning)
-        {
-            if (_isDebugMode)
-                wplButtons.Visibility = Visibility.Hidden;
-
-            SetFullScreen(true);
-            _procedure.Run(_settings.SetupIndex);
-        }
-    }
-
     // Event handlers
+
+    private void Procedure_Started(object? sender, EventArgs e)
+    {
+        if (_isDebugMode)
+            wplButtons.Visibility = Visibility.Hidden;
+
+        SetFullScreen(true);
+    }
 
     private void Procedure_NextTrial(object? sender, Setup setup)
     {
@@ -364,7 +361,7 @@ public partial class MainWindow : Window
     {
         if (e.Key == Key.Enter)
         {
-            StartProcedure();
+            _procedure.Run(_settings.SetupIndex);
         }
         else if (e.Key == Key.Escape)
         {
@@ -450,6 +447,6 @@ public partial class MainWindow : Window
 
     private void StartButton_Click(object sender, RoutedEventArgs e)
     {
-        StartProcedure();
+        _procedure.Run(_settings.SetupIndex);
     }
 }

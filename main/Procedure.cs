@@ -10,6 +10,7 @@ internal class Procedure
 
     public bool IsRunning => _state != State.Inactive;
 
+    public event EventHandler? Started;
     public event EventHandler<Setup>? NextTrial;
     public event EventHandler? StimuliShown;
     public event EventHandler<bool?>? StimuliHidden;
@@ -31,6 +32,15 @@ internal class Procedure
 
         _server.ClientConnected += (s, e) => ConnectionStatusChanged?.Invoke(this, true);
         _server.ClientDisconnected += (s, e) => ConnectionStatusChanged?.Invoke(this, false);
+        _server.Data += (s, e) =>
+        {
+            if (e == "start")
+            {
+                if (!IsRunning)
+                    Run(_settings.SetupIndex);
+            }
+        };
+
         _server.Start();
 
         try
@@ -65,6 +75,8 @@ internal class Procedure
         _targetIndexes = PrepareTargets(CurrentSetup);
 
         _trialIndex = -1;
+
+        Started?.Invoke(this, EventArgs.Empty);
 
         Next();
     }

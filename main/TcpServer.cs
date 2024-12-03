@@ -9,9 +9,10 @@ public class TcpServer : IDisposable
 {
     public static int Port => 8963;
 
-    public event EventHandler Started = delegate { };
-    public event EventHandler ClientConnected = delegate { };
-    public event EventHandler ClientDisconnected = delegate { };
+    public event EventHandler? Started;
+    public event EventHandler? ClientConnected;
+    public event EventHandler? ClientDisconnected;
+    public event EventHandler<string>? Data;
 
     public bool IsListening { get; private set; } = false;
     public bool IsClientConnected { get; private set; } = false;
@@ -57,7 +58,7 @@ public class TcpServer : IDisposable
             listener.Listen(100);
 
             IsListening = true;
-            Started(this, new EventArgs());
+            Started?.Invoke(this, EventArgs.Empty);
             Debug.WriteLine($"listening on port {Port}...");
 
             while (!IsDisposed)
@@ -69,7 +70,7 @@ public class TcpServer : IDisposable
                 }
 
                 IsClientConnected = true;
-                ClientConnected(this, new EventArgs());
+                ClientConnected?.Invoke(this, EventArgs.Empty);
                 Debug.WriteLine($"Connected");
 
                 var data = new byte[1024];
@@ -85,19 +86,16 @@ public class TcpServer : IDisposable
                     else
                     {
                         string msg = Encoding.ASCII.GetString(buffer.Array, 0, byteCount).Trim();
-                        if (_digitSign != '.')
-                        {
-                            msg = msg.Replace('.', _digitSign);
-                        }
 
                         Debug.WriteLine($"Data received: {msg}");
+                        Data?.Invoke(this, msg);
                     }
                 }
 
                 IsClientConnected = false;
 
                 Debug.WriteLine($"Disconnected");
-                ClientDisconnected(this, new EventArgs());
+                ClientDisconnected?.Invoke(this, EventArgs.Empty);
 
                 _connection.Close();
                 _connection = null;
@@ -118,15 +116,13 @@ public class TcpServer : IDisposable
         if (IsClientConnected)
         {
             IsClientConnected = false;
-            ClientDisconnected(this, new EventArgs());
+            ClientDisconnected?.Invoke(this, EventArgs.Empty);
         }
 
         Debug.WriteLine($"Exit");
     }
 
     // Internal
-
-    private readonly char _digitSign = System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator[0];
 
     private Socket? _connection;
 }
