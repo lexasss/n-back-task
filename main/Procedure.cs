@@ -5,6 +5,8 @@ namespace NBackTask;
 
 internal class Procedure
 {
+    public enum StopReason { Interrupted, Finished }
+
     public Setup[] Setups => _setups.ToArray();
     public Setup? CurrentSetup { get; private set; } = null;
 
@@ -14,7 +16,7 @@ internal class Procedure
     public event EventHandler<Setup>? NextTrial;
     public event EventHandler? StimuliShown;
     public event EventHandler<bool?>? StimuliHidden;
-    public event EventHandler? Finished;
+    public event EventHandler<StopReason>? Stopped;
     public event EventHandler<bool>? ConnectionStatusChanged;
 
     public Procedure()
@@ -38,6 +40,11 @@ internal class Procedure
             {
                 if (!IsRunning)
                     Run(_settings.SetupIndex);
+            }
+            else if (e == "stop")
+            {
+                if (IsRunning)
+                    Stop();
             }
         };
 
@@ -81,7 +88,7 @@ internal class Procedure
         Next();
     }
 
-    public void Stop()
+    public void Stop(StopReason reason = StopReason.Interrupted)
     {
         if (_state == State.Inactive)
             return;
@@ -89,6 +96,8 @@ internal class Procedure
         _timer.Stop();
 
         UpdateState(State.Inactive);
+
+        Stopped?.Invoke(this, reason);
     }
 
     public bool ActivateStimulus(Stimulus? stimulus)
@@ -223,8 +232,7 @@ internal class Procedure
         }
         else
         {
-            Stop();
-            Finished?.Invoke(this, EventArgs.Empty);
+            Stop(StopReason.Finished);
 
             var filename = _logger.Save();
             if (filename == null)

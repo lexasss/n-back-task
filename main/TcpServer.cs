@@ -77,7 +77,16 @@ public class TcpServer : IDisposable
                 while (!IsDisposed)
                 {
                     var buffer = new ArraySegment<byte>(data);
-                    var byteCount = await _connection.ReceiveAsync(buffer, SocketFlags.None);
+                    int byteCount = 0;
+
+                    try
+                    {
+                        byteCount = await _connection.ReceiveAsync(buffer, SocketFlags.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Network reading error: {ex.Message}");
+                    }
 
                     if (byteCount == 0 || buffer.Array == null)
                     {

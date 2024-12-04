@@ -25,7 +25,7 @@ public partial class MainWindow : Window
         _procedure.NextTrial += Procedure_NextTrial;
         _procedure.StimuliShown += Procedure_StimuliShown;
         _procedure.StimuliHidden += Procedure_StimuliHidden;
-        _procedure.Finished += Procedure_Finished;
+        _procedure.Stopped += Procedure_Finished;
         _procedure.ConnectionStatusChanged += Procedure_ConnectionStatusChanged;
 
         LoadSetup(0);
@@ -272,7 +272,7 @@ public partial class MainWindow : Window
         });
     }
 
-    private void Procedure_Finished(object? sender, EventArgs e)
+    private void Procedure_Finished(object? sender, Procedure.StopReason stopReason)
     {
         Dispatcher.Invoke(() =>
         {
@@ -283,7 +283,7 @@ public partial class MainWindow : Window
 
             SetFullScreen(false);
 
-            DisplayInfo("Finished!");
+            DisplayInfo(stopReason == Procedure.StopReason.Finished ? "Finished!" : "Interrupted");
             DisplayInfo("Press ENTER to start", 2000);
         });
     }
@@ -368,16 +368,6 @@ public partial class MainWindow : Window
             if (_procedure.IsRunning)
             {
                 _procedure.Stop();
-
-                grdSetup.Visibility = Visibility.Hidden;
-
-                if (_isDebugMode)
-                    wplButtons.Visibility = Visibility.Visible;
-
-                SetFullScreen(false);
-
-                DisplayInfo("Interrupted");
-                DisplayInfo("Press ENTER to start", 2000);
             }
         }
         else if (e.Key >= Key.D1 && e.Key <= Key.D9)
