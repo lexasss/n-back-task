@@ -11,6 +11,7 @@ internal class Procedure
     public Setup? CurrentSetup { get; private set; } = null;
 
     public bool IsRunning => _state != State.Inactive;
+    public bool IsServerReady => _server.IsListening;
 
     public event EventHandler? Started;
     public event EventHandler<Setup>? NextTrial;

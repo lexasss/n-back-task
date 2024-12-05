@@ -26,16 +26,6 @@ public class TcpServer : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public void Restart(int delay)
-    {
-        var timer = new System.Timers.Timer(delay * 1000);
-        timer.Elapsed += (s, a) => {
-            timer.Stop();
-            Start();
-        };
-        timer.Start();
-    }
-
     public async void Send(string data)
     {
         if (_connection != null)
@@ -113,7 +103,7 @@ public class TcpServer : IDisposable
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Connection error: {ex.Message}");
+            Debug.WriteLine($"TCP server error: {ex.Message}");
         }
         finally
         {

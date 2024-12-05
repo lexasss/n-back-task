@@ -28,6 +28,8 @@ public partial class MainWindow : Window
         _procedure.Stopped += Procedure_Finished;
         _procedure.ConnectionStatusChanged += Procedure_ConnectionStatusChanged;
 
+        Procedure_ConnectionStatusChanged(null, false);
+
         LoadSetup(0);
     }
 
@@ -221,77 +223,68 @@ public partial class MainWindow : Window
 
     // Event handlers
 
-    private void Procedure_Started(object? sender, EventArgs e)
+    private void Procedure_Started(object? sender, EventArgs e) => Dispatcher.Invoke(() =>
     {
         if (_isDebugMode)
             wplButtons.Visibility = Visibility.Hidden;
 
         SetFullScreen(true);
-    }
+    });
 
-    private void Procedure_NextTrial(object? sender, Setup setup)
+    private void Procedure_NextTrial(object? sender, Setup setup) => Dispatcher.Invoke(() =>
     {
-        Dispatcher.Invoke(() =>
+        DisplayInfo("+");
+        if (setup.StimuliOrder == StimuliOrder.Randomized)
         {
-            DisplayInfo("+");
-            if (setup.StimuliOrder == StimuliOrder.Randomized)
+            var stimuliOrdered = ShuffleStimuli(setup);
+            _procedure.LogStimuliOrder(stimuliOrdered);
+        }
+    });
+
+    private void Procedure_StimuliShown(object? sender, EventArgs e) => Dispatcher.Invoke(() =>
+    {
+        grdSetup.Visibility = Visibility.Visible;
+    });
+
+    private void Procedure_StimuliHidden(object? sender, bool? isCorrect) => Dispatcher.Invoke(() =>
+    {
+        if (isCorrect != null && _settings.InfoDuration > 0)
+        {
+            DisplayInfo(isCorrect == true ? "Success" : "Failed");
+        }
+        grdSetup.Visibility = Visibility.Hidden;
+
+        foreach (Border el in _stimuliElements)
+        {
+            var label = el.Child as Label;
+            if (label != null)
             {
-                var stimuliOrdered = ShuffleStimuli(setup);
-                _procedure.LogStimuliOrder(stimuliOrdered);
+                label.Background = _settings.StimulusColor;
+                label.Foreground = _settings.StimulusFontColor;
             }
-        });
-    }
+        }
+    });
 
-    private void Procedure_StimuliShown(object? sender, EventArgs e)
+    private void Procedure_Finished(object? sender, Procedure.StopReason stopReason) => Dispatcher.Invoke(() =>
     {
-        Dispatcher.Invoke(() =>
+        grdSetup.Visibility = Visibility.Hidden;
+
+        if (_isDebugMode)
+            wplButtons.Visibility = Visibility.Visible;
+
+        SetFullScreen(false);
+
+        DisplayInfo(stopReason == Procedure.StopReason.Finished ? "Finished!" : "Interrupted");
+        DisplayInfo("Press ENTER to start", 2000);
+    });
+
+    private void Procedure_ConnectionStatusChanged(object? sender, bool isConnected) => Dispatcher.Invoke(() =>
+    {
+        if (_procedure.IsServerReady)
         {
-            grdSetup.Visibility = Visibility.Visible;
-        });
-    }
-
-    private void Procedure_StimuliHidden(object? sender, bool? isCorrect)
-    {
-        Dispatcher.Invoke(() =>
-        {
-            if (isCorrect != null && _settings.InfoDuration > 0)
-            {
-                DisplayInfo(isCorrect == true ? "Success" : "Failed");
-            }
-            grdSetup.Visibility = Visibility.Hidden;
-
-            foreach (Border el in _stimuliElements)
-            {
-                var label = el.Child as Label;
-                if (label != null)
-                {
-                    label.Background = _settings.StimulusColor;
-                    label.Foreground = _settings.StimulusFontColor;
-                }
-            }
-        });
-    }
-
-    private void Procedure_Finished(object? sender, Procedure.StopReason stopReason)
-    {
-        Dispatcher.Invoke(() =>
-        {
-            grdSetup.Visibility = Visibility.Hidden;
-
-            if (_isDebugMode)
-                wplButtons.Visibility = Visibility.Visible;
-
-            SetFullScreen(false);
-
-            DisplayInfo(stopReason == Procedure.StopReason.Finished ? "Finished!" : "Interrupted");
-            DisplayInfo("Press ENTER to start", 2000);
-        });
-    }
-
-    private void Procedure_ConnectionStatusChanged(object? sender, bool e)
-    {
-        imgTcpClient.Source = e ? _tcpOnImage : _tcpOffImage;
-    }
+            imgTcpClient.Source = isConnected ? _tcpOnImage : _tcpOffImage;
+        }
+    });
 
     // UI
 
