@@ -153,7 +153,7 @@ internal class Player
 
     public static int NumberOfInstructions => Directory
         .GetFiles(SoundsFolder, $"*.{AudioType}")
-        .Where(filename => int.TryParse(Path.GetFileNameWithoutExtension(filename), out int id) && id > 0 && id < 10)
+        .Where(filename => int.TryParse(Path.GetFileNameWithoutExtension(filename), out int id) && id >= 0 && id < 10)
         .Count();
 
     public Player()

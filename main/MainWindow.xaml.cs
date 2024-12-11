@@ -31,6 +31,7 @@ public partial class MainWindow : Window
         Procedure_ConnectionStatusChanged(null, false);
 
         LoadSetup(0);
+        UpdateSetupButtonState();
     }
 
     // Internal
@@ -221,6 +222,16 @@ public partial class MainWindow : Window
         }
     }
 
+    private void UpdateSetupButtonState()
+    {
+        var setupStudy = FindResource("Setup") as Style;
+        var setupButtons = wplButtons.Children.OfType<Button>().Where(el => el.Style == setupStudy);
+        for (int i = 0; i < setupButtons.Count(); i++)
+        {
+            setupButtons.ElementAt(i).IsEnabled = i < _procedure.Setups.Length;
+        }
+    }
+
     // Event handlers
 
     private void Procedure_Started(object? sender, EventArgs e) => Dispatcher.Invoke(() =>
@@ -401,6 +412,7 @@ public partial class MainWindow : Window
                 if (_procedure.ShowSetupEditor() is int selectedIndex)
                 {
                     LoadSetup(selectedIndex);
+                    UpdateSetupButtonState();
                 }
             }
         }

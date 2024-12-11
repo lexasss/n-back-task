@@ -85,6 +85,7 @@
                         FontSize="17"
                         VerticalContentAlignment="Top"
                         ToolTip="Create a new setup"
+                        IsEnabled="{Binding CanAddSetup}"
                         Click="CreateSetup_Click"/>
             </Grid>
             <Grid>

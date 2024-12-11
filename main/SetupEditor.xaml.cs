@@ -7,6 +7,7 @@ public partial class SetupEditor : Window, INotifyPropertyChanged
 {
     public IEnumerable<string> SetupNames => _setups.Select(setup => setup.Name);
     public bool CanDeleteSetup => SetupNames.Count() > 1;
+    public bool CanAddSetup => SetupNames.Count() < 9;
     public SetupData? SetupData => _selectedSetupIndex < 0 ? null : _setups[_selectedSetupIndex];
 
     public event PropertyChangedEventHandler? PropertyChanged;
