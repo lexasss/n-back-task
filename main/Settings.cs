@@ -45,6 +45,16 @@ internal class Settings : INotifyPropertyChanged
         }
     }
 
+    public bool PlayBackgroundNoise
+    {
+        get => _playBackgroundNoise;
+        set
+        {
+            _playBackgroundNoise = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PlayBackgroundNoise)));
+        }
+    }
+
     // Session-only
 
     public int SetupIndex { get; set; } = -1;
@@ -91,6 +101,8 @@ internal class Settings : INotifyPropertyChanged
         settings.TestCount = TrialCount;
         settings.LogFolder = LogFolder;
 
+        settings.PlayBackgroundNoise = PlayBackgroundNoise;
+
         settings.Save();
     }
 
@@ -99,6 +111,7 @@ internal class Settings : INotifyPropertyChanged
     static Settings? _instance = null;
 
     string _logFolder = "";
+    bool _playBackgroundNoise = false;
 
 #pragma warning disable CS8618
     private Settings()
@@ -131,5 +144,7 @@ internal class Settings : INotifyPropertyChanged
         InputMode = (InputMode)settings.InputMode;
         TrialCount = settings.TestCount;
         LogFolder = settings.LogFolder;
+
+        PlayBackgroundNoise = settings.PlayBackgroundNoise;
     }
 }

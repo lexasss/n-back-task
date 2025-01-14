@@ -51,16 +51,13 @@ internal class Procedure
 
         _server.Start();
 
-        try
-        {
-            _backgroundSound = new("assets/sounds/noise.mp3", "background");
-            _backgroundSound.Play(true);
-        }
-        catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
+        UpdateBackgroundNoiseState();
+
+        _settings.Updated += (s, e) => UpdateBackgroundNoiseState();
 
         Application.Current.Exit += (s, e) =>
         {
-            _backgroundSound?.Stop();
+            _backgroundSound.Stop();
             SaveSetups();
         };
     }
@@ -176,7 +173,7 @@ internal class Procedure
     readonly Settings _settings = Settings.Instance;
     readonly Random _random = new();
     readonly List<Setup> _setups = [];
-    readonly Sound? _backgroundSound;
+    readonly Sound _backgroundSound = new("assets/sounds/noise.mp3", "background");
 
     readonly TcpServer _server = new();
 
@@ -328,6 +325,18 @@ internal class Procedure
         _random.Shuffle(shuffledIndexes);
 
         return shuffledIndexes.ToArray();
+    }
+
+    private void UpdateBackgroundNoiseState()
+    {
+        if (_settings.PlayBackgroundNoise && !_backgroundSound.IsPlaying)
+        {
+            _backgroundSound.Play(true);
+        }
+        else if (!_settings.PlayBackgroundNoise && _backgroundSound.IsPlaying)
+        {
+            _backgroundSound.Stop();
+        }
     }
 
 
