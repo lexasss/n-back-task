@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Media;
+using System.Text.Json;
 using System.Windows;
 
 namespace NBackTask;
@@ -308,6 +309,8 @@ internal class Procedure
 
             _server.Send($"FIN");
             _logger.Add("experiment", "stop");
+
+            SystemSounds.Beep.Play();
         }
     }
 
