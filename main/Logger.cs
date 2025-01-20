@@ -3,6 +3,31 @@ using System.Windows;
 
 namespace NBackTask;
 
+internal enum LogSource
+{
+    Experiment,
+    Stimuli,
+    Stimulus
+}
+
+internal enum LogAction
+{
+    Start,
+    Stop,
+    Result,
+    Target,
+    Displayed,
+    Activated,
+    Hidden,
+    Ordered
+}
+
+internal record class LogRecord(LogSource Source, LogAction Action, params object[] Args)
+{
+    public long Timestamp = DateTime.Now.Ticks;
+    public string AsString() => string.Join('\t', [Timestamp, Source, Action, ..Args]);
+}
+
 internal class Logger
 {
     public static Logger Instance => _instance ??= new();
@@ -15,13 +40,11 @@ internal class Logger
         }
     }
 
-    public void Add(params object[] items)
+    public void Add(LogSource source, LogAction action, params object[] args)
     {
-        var record = string.Join('\t', [DateTime.Now.Ticks, ..items]);
-
         lock (_records)
         {
-            _records.Add(record);
+            _records.Add(new LogRecord(source, action, args));
         }
     }
 
@@ -46,8 +69,10 @@ internal class Logger
             {
                 foreach (var record in _records)
                 {
-                    writer.WriteLine(record);
+                    writer.WriteLine(record.AsString());
                 }
+
+                Statistics.CreateAndWriteToFile(_records, writer);
 
                 _records.Clear();
             }
@@ -86,6 +111,86 @@ internal class Logger
 
     static Logger? _instance = null;
 
-    readonly List<string> _records = [];
+    readonly List<LogRecord> _records = [];
     readonly Settings _settings = Settings.Instance;
+}
+
+file static class Statistics
+{
+    public static void CreateAndWriteToFile(IEnumerable<LogRecord> records, StreamWriter writer)
+    {
+        List<StatRecord> stat = new();
+
+        string? target = null;
+        string? response = null;
+        int clicks = 0;
+        long targetDisplayTimestamp = 0;
+        long responseTimestamp = 0;
+
+        foreach (var record in records)
+        {
+            if (record.Source == LogSource.Stimuli && record.Action == LogAction.Target)
+            {
+                target = (string)record.Args[0];
+                response = null;
+                clicks = 0;
+                responseTimestamp = 0;
+            }
+            else if (record.Source == LogSource.Stimuli && record.Action == LogAction.Displayed)
+            {
+                targetDisplayTimestamp = record.Timestamp;
+            }
+            else if (record.Source == LogSource.Stimulus && record.Action == LogAction.Activated)
+            {
+                if (target != null)
+                {
+                    clicks += 1;
+
+                    if (response == null)
+                    {
+                        response = (string)record.Args[0];
+                        responseTimestamp = record.Timestamp;
+                    }
+                }
+            }
+            else if (record.Source == LogSource.Stimuli && record.Action == LogAction.Hidden)
+            {
+                var isMissingCorrectActivation = target != response;
+
+                stat.Add(new StatRecord(target ?? "?",
+                    response ?? "",
+                    (isMissingCorrectActivation, clicks) switch
+                    {
+                        (true, 0) => Result.MISS,
+                        (true, > 0) => Result.FAIL,
+                        _ => Result.OK,
+                    },
+                    isMissingCorrectActivation ? "" : ((responseTimestamp - targetDisplayTimestamp) / 10000).ToString(),
+                    clicks
+                ));
+
+                target = null;
+            }
+        }
+
+        writer.WriteLine("#");
+        writer.WriteLine(string.Join('\t', ["Target", "Response", "Result", "Interval", "Count"]));
+        foreach (var record in stat)
+        {
+            writer.WriteLine(record.AsString());
+        }
+    }
+
+    // Internal
+
+    enum Result
+    {
+        OK,
+        FAIL,
+        MISS
+    }
+    private record class StatRecord(string Target, string Response, Result Result, string Interval, int Count)
+    {
+        public string AsString() => string.Join('\t', [Target, Response, Result, Interval, Count]);
+    }
 }

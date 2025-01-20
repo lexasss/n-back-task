@@ -13,20 +13,16 @@
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://github.com/lexasss/n-back-task/releases/</PackageProjectUrl>
     <Copyright>Oleg Spakov @ 2024</Copyright>
-    <PackageReadmeFile></PackageReadmeFile>
     <RepositoryUrl>https://github.com/lexasss/n-back-task/</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="assets\images\delete.png" />
-    <None Remove="assets\images\tcp-no.png" />
-    <None Remove="assets\images\tcp-off.png" />
-    <None Remove="assets\images\tcp-on.png" />
+    <PackageReference Include="Egorozh.ColorPicker.WPF.Dialog" Version="5.0.0" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Egorozh.ColorPicker.WPF.Dialog" Version="5.0.0" />
-    <PackageReference Include="NAudio" Version="2.2.1" />
+    <ProjectReference Include="..\ColorPickerWPF\ColorPickerWPF.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,10 +47,6 @@
 
   <ItemGroup>
     <Folder Include="assets\sounds\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\ColorPickerWPF\ColorPickerWPF.csproj" />
   </ItemGroup>
 
   <ItemGroup>

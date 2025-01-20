@@ -74,7 +74,7 @@ internal class Procedure
         CurrentSetup = _setups[setupIndex];
 
         _logger.Reset();
-        _logger.Add("experiment", "start", CurrentSetup.Name);
+        _logger.Add(LogSource.Experiment, LogAction.Start, CurrentSetup.Name);
 
         _server.Send($"STR");
 
@@ -115,7 +115,7 @@ internal class Procedure
         if (wasActivated && stimulus != null)
         {
             stimulus.WasActivated = true;
-            _logger.Add("stimulus", "activated", stimulus.Text);
+            _logger.Add(LogSource.Stimulus, LogAction.Activated, stimulus.Text);
             _server.Send($"ACT {stimulus.Text}");
             System.Diagnostics.Debug.WriteLine($"Activated: {stimulus.Text}");
         }
@@ -134,7 +134,7 @@ internal class Procedure
 
     public void LogStimuliOrder(Stimulus[] stimuli)
     {
-        _logger.Add("stimuli", "order", string.Join(' ', stimuli.Select(s => s.Text)));
+        _logger.Add(LogSource.Stimuli, LogAction.Ordered, string.Join(' ', stimuli.Select(s => s.Text)));
     }
 
     public int? ShowSetupEditor()
@@ -255,7 +255,7 @@ internal class Procedure
             _timer.Start();
 
             var stimulus = CurrentSetup.Stimuli[_targetIndexes[_trialIndex]];
-            _logger.Add("stimuli", "target", stimulus?.Text ?? "?");
+            _logger.Add(LogSource.Stimuli, LogAction.Target, stimulus?.Text ?? "?");
 
             if (_settings.InfoDuration == 0 && _settings.BlankScreenDuration > 0)
             {
@@ -271,9 +271,9 @@ internal class Procedure
 
             StimuliShown?.Invoke(this, EventArgs.Empty);
 
-            _logger.Add("stimuli", "displayed");
-
             var stimulus = CurrentSetup.Stimuli[_targetIndexes[_trialIndex]];
+            _logger.Add(LogSource.Stimuli, LogAction.Displayed, stimulus?.Text ?? "?");
+
             if (stimulus != null)
             {
                 _server.Send($"SET {stimulus.Text}");
@@ -292,8 +292,8 @@ internal class Procedure
             var stimulus = CurrentSetup.Stimuli[_targetIndexes[_trialIndex]];
 
             bool isCorrect = stimulus?.WasActivated ?? false;
-            _logger.Add("stimuli", "hidden");
-            _logger.Add("experiment", "result", isCorrect ? "success" : "failure");
+            _logger.Add(LogSource.Stimuli, LogAction.Hidden);
+            _logger.Add(LogSource.Experiment, LogAction.Result, isCorrect ? "success" : "failure");
 
             _server.Send($"RES {stimulus?.Text} {isCorrect}");
 
@@ -308,7 +308,7 @@ internal class Procedure
             CurrentSetup = null;
 
             _server.Send($"FIN");
-            _logger.Add("experiment", "stop");
+            _logger.Add(LogSource.Experiment, LogAction.Stop);
 
             SystemSounds.Beep.Play();
         }
@@ -341,7 +341,6 @@ internal class Procedure
             _backgroundSound.Stop();
         }
     }
-
 
     private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
