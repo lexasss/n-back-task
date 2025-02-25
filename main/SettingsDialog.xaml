@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:NBackTask"
         mc:Ignorable="d"
         Title="Settings"
-        Height="394"
+        Height="398"
         Width="480"
         Icon="/assets/images/icon.png"
         ResizeMode="NoResize"
@@ -231,6 +231,8 @@
 
             <CheckBox IsChecked="{Binding PlayBackgroundNoise, Mode=TwoWay}"
                       Content="Play background noise"/>
+            <CheckBox IsChecked="{Binding PlaySoundOnActivation, Mode=TwoWay}"
+                      Content="Play activation sound"/>
 
         </StackPanel>
 

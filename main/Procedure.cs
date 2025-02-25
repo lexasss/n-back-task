@@ -117,6 +117,12 @@ internal class Procedure
             stimulus.WasActivated = true;
             _logger.Add(LogSource.Stimulus, LogAction.Activated, stimulus.Text);
             _server.Send($"ACT {stimulus.Text}");
+
+            if (_settings.PlaySoundOnActivation)
+            {
+                _activationSound.Play();
+            }
+
             System.Diagnostics.Debug.WriteLine($"Activated: {stimulus.Text}");
         }
 
@@ -175,6 +181,7 @@ internal class Procedure
     readonly Random _random = new();
     readonly List<Setup> _setups = [];
     readonly Sound _backgroundSound = new("assets/sounds/noise.mp3", "background");
+    readonly Sound _activationSound = new("assets/sounds/activation.mp3", "activation");
 
     readonly TcpServer _server = new();
 

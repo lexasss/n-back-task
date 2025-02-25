@@ -46,10 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="assets\sounds\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="assets\images\icon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -82,6 +78,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="assets\sounds\9.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="assets\sounds\activation.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="assets\sounds\failed.mp3">

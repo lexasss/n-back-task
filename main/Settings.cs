@@ -31,6 +31,7 @@ internal class Settings : INotifyPropertyChanged
     public bool ActivationInterruptsTrial { get; set; }
     public bool AllowMultipleActivations { get; set; }
     public int StimulusUnstretchedSize { get; set; }
+    public bool PlaySoundOnActivation { get; set; }
 
     public InputMode InputMode { get; set; }
     public int TrialCount { get; set; }
@@ -96,6 +97,7 @@ internal class Settings : INotifyPropertyChanged
         settings.ActivationInterruptsTrial = ActivationInterruptsTrial;
         settings.AllowMultipleActivations = AllowMultipleActivations;
         settings.StimulusUnstretchedSize = StimulusUnstretchedSize;
+        settings.PlaySoundOnActivation = PlaySoundOnActivation;
 
         settings.InputMode = (int)InputMode;
         settings.TestCount = TrialCount;
@@ -140,6 +142,7 @@ internal class Settings : INotifyPropertyChanged
         ActivationInterruptsTrial = settings.ActivationInterruptsTrial;
         AllowMultipleActivations = settings.AllowMultipleActivations;
         StimulusUnstretchedSize = settings.StimulusUnstretchedSize;
+        PlaySoundOnActivation = settings.PlaySoundOnActivation;
 
         InputMode = (InputMode)settings.InputMode;
         TrialCount = settings.TestCount;
