@@ -340,53 +340,53 @@ public partial class ColorPickerControl : UserControl
         _hueImageBitmap.Unlock();
     }
 
-    private void RSlider_ValueChanged(object sender, double value)
+    private void RSlider_ValueChanged(object sender, SliderRow.ValueChangedEventArgs e)
     {
         if (!_isSettingValues)
         {
-            var val = (byte)value;
+            var val = (byte)e.Value;
             _color.R = val;
             SetColor(_color);
         }
     }
 
-    private void GSlider_ValueChanged(object sender, double value)
+    private void GSlider_ValueChanged(object sender, SliderRow.ValueChangedEventArgs e)
     {
         if (!_isSettingValues)
         {
-            var val = (byte)value;
+            var val = (byte)e.Value;
             _color.G = val;
             SetColor(_color);
         }
     }
 
-    private void BSlider_ValueChanged(object sender, double value)
+    private void BSlider_ValueChanged(object sender, SliderRow.ValueChangedEventArgs e)
     {
         if (!_isSettingValues)
         {
-            var val = (byte)value;
+            var val = (byte)e.Value;
             _color.B = val;
             SetColor(_color);
         }
     }
 
-    private void ASlider_ValueChanged(object sender, double value)
+    private void ASlider_ValueChanged(object sender, SliderRow.ValueChangedEventArgs e)
     {
         if (!_isSettingValues)
         {
-            var val = (byte)value;
+            var val = (byte)e.Value;
             _color.A = val;
             SetColor(_color);
         }
     }
 
-    private void HSlider_ValueChanged(object sender, double value)
+    private void HSlider_ValueChanged(object sender, SliderRow.ValueChangedEventArgs e)
     {
         if (!_isSettingValues)
         {
             var s = _color.GetSaturation();
             var l = _color.GetBrightness();
-            var h = (float)value;
+            var h = (float)e.Value;
             var a = (int)slrA.Slider.Value;
             _color = ColorUtils.FromAhsb(a, h, s, l);
 
@@ -394,11 +394,11 @@ public partial class ColorPickerControl : UserControl
         }
     }
 
-    private void SSlider_ValueChanged(object sender, double value)
+    private void SSlider_ValueChanged(object sender, SliderRow.ValueChangedEventArgs e)
     {
         if (!_isSettingValues)
         {
-            var s = (float)value;
+            var s = (float)e.Value;
             var l = _color.GetBrightness();
             var h = _color.GetHue();
             var a = (int)slrA.Slider.Value;
@@ -408,12 +408,12 @@ public partial class ColorPickerControl : UserControl
         }
     }
 
-    private void LSlider_ValueChanged(object sender, double value)
+    private void LSlider_ValueChanged(object sender, SliderRow.ValueChangedEventArgs e)
     {
         if (!_isSettingValues)
         {
             var s = _color.GetSaturation();
-            var l = (float)value;
+            var l = (float)e.Value;
             var h = _color.GetHue();
             var a = (int)slrA.Slider.Value;
             _color = ColorUtils.FromAhsb(a, h, s, l);
@@ -424,18 +424,14 @@ public partial class ColorPickerControl : UserControl
 
     private void HexValue_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
     {
-        if (!_isSettingValues && !IsLoaded)
+        if (!_isSettingValues && IsLoaded)
         {
-            try
-            {
-                SetColor(ColorUtils.FromHexString(txbHexValue.Text));
-            }
-            catch { }
+            SetColor(ColorUtils.FromHexString(txbHexValue.Text));
         }
     }
 
-    private void Swatch_ColorPicked(object sender, Color color)
+    private void Swatch_ColorPicked(object sender, ColorPickerSwatch.ColorPickedEventArgs e)
     {
-        SetColor(color);
+        SetColor(e.Color);
     }
 }

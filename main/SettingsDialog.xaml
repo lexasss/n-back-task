@@ -83,37 +83,37 @@
             <Label Style="{StaticResource Header}">View</Label>
             <Grid>
                 <Label>Blank screen background</Label>
-                <Button x:Name="btnScreenColor" Style="{StaticResource Color}" Click="Color_Click">
+                <Button Style="{StaticResource Color}" Click="Color_Click">
                     <Rectangle Fill="{Binding ScreenColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
                 </Button>
             </Grid>
             <Grid>
                 <Label>Stimuli screen background</Label>
-                <Button x:Name="btnActiveScreenColor" Style="{StaticResource Color}" Click="Color_Click">
+                <Button Style="{StaticResource Color}" Click="Color_Click">
                     <Rectangle Fill="{Binding ActiveScreenColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
                 </Button>
             </Grid>
             <Grid>
                 <Label>Stimulus background</Label>
-                <Button x:Name="btnStimulusColor" Style="{StaticResource Color}" Click="Color_Click">
+                <Button Style="{StaticResource Color}" Click="Color_Click">
                     <Rectangle Fill="{Binding StimulusColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
                 </Button>
             </Grid>
             <Grid>
                 <Label>Stimulus foreground</Label>
-                <Button x:Name="btnStimulusFontColor" Style="{StaticResource Color}" Click="Color_Click">
+                <Button Style="{StaticResource Color}" Click="Color_Click">
                     <Rectangle Fill="{Binding StimulusFontColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
                 </Button>
             </Grid>
             <Grid>
                 <Label>Selected stimulus background</Label>
-                <Button x:Name="btnActiveStimulusColor" Style="{StaticResource Color}" Click="Color_Click">
+                <Button Style="{StaticResource Color}" Click="Color_Click">
                     <Rectangle Fill="{Binding ActiveStimulusColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
                 </Button>
             </Grid>
             <Grid>
                 <Label>Selected stimulus foreground</Label>
-                <Button x:Name="btnActiveStimulusFontColor" Style="{StaticResource Color}" Click="Color_Click">
+                <Button Style="{StaticResource Color}" Click="Color_Click">
                     <Rectangle Fill="{Binding ActiveStimulusFontColor, Mode=TwoWay, Converter={StaticResource scb2brush}}"/>
                 </Button>
             </Grid>

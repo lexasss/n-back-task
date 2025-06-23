@@ -10,7 +10,11 @@ public partial class ColorPickerSwatch : UserControl
 {
     public static ColorPickerControl ColorPickerControl { get; set; }
 
-    public event EventHandler<Color> ColorPicked;
+    public class ColorPickedEventArgs(Color color) : EventArgs
+    {
+        public Color Color => color;
+    }
+    public event EventHandler<ColorPickedEventArgs> ColorPicked;
 
     public bool Editable { get; set; }
     public Color CurrentColor { get; set; } = Colors.White;
@@ -52,7 +56,7 @@ public partial class ColorPickerSwatch : UserControl
         else
         {
             var color = border.Background as SolidColorBrush;
-            ColorPicked?.Invoke(this, color.Color);
+            ColorPicked?.Invoke(this, new ColorPickedEventArgs(color.Color));
         }
     }
 }

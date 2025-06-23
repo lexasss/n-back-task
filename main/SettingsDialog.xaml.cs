@@ -26,20 +26,20 @@ public partial class SettingsDialog : Window
     {
         if (sender is Button btn && btn.Content is Rectangle rect)
         {
+            var currentColor = (rect.Fill as SolidColorBrush)?.Color ?? Colors.White;
+
+            // I couldn't decide which color picker I love more :)
             if (new Random().NextDouble() < 0.5)
             {
-                var prevColor = (rect.Fill as SolidColorBrush)?.Color ?? Colors.White;
-                if (ColorPickerWPF.ColorPickerWindow.ShowDialog(out Color newColor, prevColor,
-                    ColorPickerWPF.DialogOptions.SimpleView |
-                    ColorPickerWPF.DialogOptions.LoadCustomPalette |
-                    ColorPickerWPF.DialogOptions.HuePicker) == true)
+                var dialogOptions = ColorPickerWPF.DialogOptions.SimpleView | ColorPickerWPF.DialogOptions.LoadCustomPalette | ColorPickerWPF.DialogOptions.HuePicker;
+                if (ColorPickerWPF.ColorPickerWindow.ShowDialog(out Color newColor, currentColor, dialogOptions) == true)
                 {
                     rect.Fill = new SolidColorBrush(newColor);
                 }
             }
-            else
+            else // maybe I should get rid of this external dependency...
             {
-                var dialog = new Egorozh.ColorPicker.Dialog.ColorPickerDialog() { Color = (rect.Fill as SolidColorBrush)?.Color ?? Colors.White };
+                var dialog = new Egorozh.ColorPicker.Dialog.ColorPickerDialog() { Color = currentColor };
                 if (dialog.ShowDialog() == true)
                 {
                     rect.Fill = new SolidColorBrush(dialog.Color);
