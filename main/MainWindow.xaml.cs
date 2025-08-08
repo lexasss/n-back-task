@@ -116,7 +116,7 @@ public partial class MainWindow : Window
 
     private void LoadSetup(int index)
     {
-        if (index < 0 || index >= _procedure.Setups.Length || index == _settings.SetupIndex)
+        if (index < 0 || index >= _procedure.Setups.Length)
             return;
 
         _settings.SetupIndex = index;
