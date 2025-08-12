@@ -27,6 +27,7 @@ public partial class MainWindow : Window
         _procedure.StimuliHidden += Procedure_StimuliHidden;
         _procedure.Stopped += Procedure_Finished;
         _procedure.ConnectionStatusChanged += Procedure_ConnectionStatusChanged;
+        _procedure.SetupRequested += Procedure_SetupRequested;
 
         Procedure_ConnectionStatusChanged(null, false);
 
@@ -236,6 +237,11 @@ public partial class MainWindow : Window
 
     private void Procedure_Started(object? sender, EventArgs e) => Dispatcher.Invoke(() =>
     {
+        Dispatcher.Invoke(() =>
+        {
+            grdSetup.Visibility = Visibility.Hidden;
+            lblInfo.Content = "Running...";
+        });
         if (_isDebugMode)
             wplButtons.Visibility = Visibility.Hidden;
 
@@ -296,6 +302,15 @@ public partial class MainWindow : Window
             imgTcpClient.Source = isConnected ? _tcpOnImage : _tcpOffImage;
         }
     });
+
+    private void Procedure_SetupRequested(object? sender, int e)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            LoadSetup(e);
+            UpdateSetupButtonState();
+        });
+    }
 
     // UI
 

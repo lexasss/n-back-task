@@ -20,6 +20,7 @@ internal class Procedure
     public event EventHandler<bool?>? StimuliHidden;
     public event EventHandler<StopReason>? Stopped;
     public event EventHandler<bool>? ConnectionStatusChanged;
+    public event EventHandler<int>? SetupRequested;
 
     public Procedure()
     {
@@ -36,19 +37,7 @@ internal class Procedure
 
         _server.ClientConnected += (s, e) => ConnectionStatusChanged?.Invoke(this, true);
         _server.ClientDisconnected += (s, e) => ConnectionStatusChanged?.Invoke(this, false);
-        _server.Data += (s, e) =>
-        {
-            if (e == "start")
-            {
-                if (!IsRunning)
-                    Run(_settings.SetupIndex);
-            }
-            else if (e == "stop")
-            {
-                if (IsRunning)
-                    Stop();
-            }
-        };
+        _server.Data += Server_Data;
 
         _server.Start();
 
@@ -63,7 +52,7 @@ internal class Procedure
         };
     }
 
-    public void Run(int setupIndex)
+    public async void Run(int setupIndex)
     {
         if (_state != State.Inactive)
             return;
@@ -83,6 +72,9 @@ internal class Procedure
         _trialIndex = -1;
 
         Started?.Invoke(this, EventArgs.Empty);
+        _player.PlayStartSound();
+
+        await Task.Delay(500);
 
         Next();
     }
@@ -174,6 +166,11 @@ internal class Procedure
     const string SOUND_CORRECT = "success";
     const string SOUND_INCORRECT = "failed";
 
+    readonly string NET_COMMAND_START = "start";
+    readonly string NET_COMMAND_STOP = "stop";
+    readonly string NET_COMMAND_SET_TASK = "set";
+    readonly string NET_COMMAND_EXIT = "exit";
+
     readonly System.Timers.Timer _timer = new();
     readonly Player _player = new();
     readonly Logger _logger = Logger.Instance;
@@ -184,6 +181,7 @@ internal class Procedure
     readonly Sound _activationSound = new("assets/sounds/activation.mp3", "activation");
 
     readonly TcpServer _server = new();
+    readonly StringComparison _stringComparison = StringComparison.OrdinalIgnoreCase;
 
     State _state = State.Inactive;
     int[] _targetIndexes = [];
@@ -346,6 +344,36 @@ internal class Procedure
         else if (!_settings.PlayBackgroundNoise && _backgroundSound.IsPlaying)
         {
             _backgroundSound.Stop();
+        }
+    }
+
+    // Event handlers
+
+    private void Server_Data(object? sender, string e)
+    {
+        if (e.Equals(NET_COMMAND_START, _stringComparison))
+        {
+            if (!IsRunning)
+                Run(_settings.SetupIndex);
+        }
+        else if (e.Equals(NET_COMMAND_STOP, _stringComparison))
+        {
+            if (IsRunning)
+                Stop();
+        }
+        else if (e.StartsWith(NET_COMMAND_SET_TASK, _stringComparison))
+        {
+            if (!IsRunning && int.TryParse(e.Substring(NET_COMMAND_SET_TASK.Length).Trim(), out int setupIndex) &&
+                setupIndex >= 0 && setupIndex < _setups.Count)
+            {
+                SetupRequested?.Invoke(this, setupIndex);
+            }
+        }
+        else if (e.Equals(NET_COMMAND_EXIT, _stringComparison))
+        {
+            if (IsRunning)
+                Stop();
+            App.Current.Shutdown();
         }
     }
 

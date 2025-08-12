@@ -194,7 +194,13 @@ internal class Player
         _sounds[name].Play(1);
     }
 
+    public void PlayStartSound()
+    {
+        Play(StartSoundName);
+    }
+
     // Internal
 
     readonly Dictionary<string, Sound> _sounds = [];
+    readonly string StartSoundName = "success";
 }
