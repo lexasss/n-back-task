@@ -271,9 +271,6 @@ internal class Procedure
         }
         else if (_state == State.Stimuli)
         {
-            _timer.Interval = _settings.StimulusDuration;
-            _timer.Start();
-
             StimuliShown?.Invoke(this, EventArgs.Empty);
 
             var stimulus = CurrentSetup.Stimuli[_targetIndexes[_trialIndex]];
@@ -284,7 +281,11 @@ internal class Procedure
                 _server.Send($"SET {stimulus.Text}");
 
                 var sound = stimulus.AudioInstruction;
-                _player.Play(sound);
+                _player.Play(sound).Then(() =>
+                {
+                    _timer.Interval = _settings.StimulusDuration;
+                    _timer.Start();
+                });
             }
 
             System.Diagnostics.Debug.WriteLine($"Trial stimulus: {CurrentSetup.Stimuli[_targetIndexes[_trialIndex]].Text}");

@@ -48,7 +48,7 @@ internal class Sound
     /// </summary>
     /// <param name="cyclic">True if the sound will play in a loop and will be stopped externally, otherwise it will stop automatically after playing the sound once</param>
     /// <param name="volume">Playback volume, 0..1</param>
-    /// <returns>Self. Could be useful when creating a chain of calls with <see cref="Chain(Action)"/></returns>
+    /// <returns>Self. Could be useful when creating a chain of calls with <see cref="Then(Action)"/></returns>
     public Sound Play(bool cyclic = false, float volume = -1)
     {
         _cyclic = cyclic;
@@ -67,14 +67,14 @@ internal class Sound
     /// Plays the sound once
     /// </summary>
     /// <param name="volume">Playback volume, 0..1</param>
-    /// <returns>Self. Could be useful when creating a chain of calls with <see cref="Chain(Action)"/></returns>
+    /// <returns>Self. Could be useful when creating a chain of calls with <see cref="Then(Action)"/></returns>
     public Sound Play(float volume) => Play(false, volume);
 
     /// <summary>
     /// Registers a callback to execute after the playback stops automatically.
     /// </summary>
     /// <param name="onFinished">A callback function</param>
-    public void Chain(Action onFinished)
+    public void Then(Action onFinished)
     {
         _onFinished.Add(onFinished);
     }
@@ -189,14 +189,16 @@ internal class Player
         return result;
     }
 
-    public void Play(string name)
+    public Sound Play(string name)
     {
-        _sounds[name].Play(1);
+        var result = _sounds[name];
+        result.Play(1);
+        return result;
     }
 
-    public void PlayStartSound()
+    public Sound PlayStartSound()
     {
-        Play(StartSoundName);
+        return Play(StartSoundName);
     }
 
     // Internal
