@@ -17,6 +17,9 @@ public partial class MainWindow : Window
         grdSetup.Visibility = Visibility.Hidden;
         wplButtons.Visibility = Visibility.Hidden;
 
+        lblInfo.Foreground = InverseColor(_settings.ScreenColor.Color);
+        tblInstructions.Foreground = InverseColor(_settings.ScreenColor.Color);
+
         _fontSizeController = new FontSizeController(this);
 
         _settings.Updated += (s, e) => UpdateStimuli();
@@ -51,6 +54,12 @@ public partial class MainWindow : Window
 
     bool _isDebugMode = false;
     bool _windowWasMaximized = false;
+
+    private Brush InverseColor(Color color) => new SolidColorBrush(Color.FromRgb(
+            (byte)(255 - color.R),
+            (byte)(255 - color.G),
+            (byte)(255 - color.B)
+        ));
 
     private void SetFullScreen(bool isFullScreen)
     {
@@ -199,6 +208,9 @@ public partial class MainWindow : Window
     {
         Background = _settings.ScreenColor;
         grdSetup.Background = _settings.ActiveScreenColor;
+
+        lblInfo.Foreground = InverseColor(_settings.ScreenColor.Color);
+        tblInstructions.Foreground = InverseColor(_settings.ScreenColor.Color);
 
         var setup = _procedure.Setups[_settings.SetupIndex];
         _fontSizeController.SetStimulusSize(_settings.StimulusUnstretchedSize);
