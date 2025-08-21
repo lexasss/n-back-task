@@ -313,7 +313,12 @@ internal class Procedure
         {
             CurrentSetup = null;
 
-            _server.Send($"FIN");
+            Task.Run(async () =>
+            {
+                await Task.Delay(300); // much needed, otherwise TPC packets may be joined
+                _server.Send($"FIN");
+            });
+
             _logger.Add(LogSource.Experiment, LogAction.Stop);
 
             SystemSounds.Beep.Play();
