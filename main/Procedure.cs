@@ -62,6 +62,12 @@ internal class Procedure
 
         CurrentSetup = _setups[setupIndex];
 
+        if (_settings.TaskType == TaskType.OneBack && CurrentSetup.Stimuli.FirstOrDefault(s => s.Text == _settings.OneBackStimulus) == null)
+        {
+            MessageBox.Show($"Cannot run this setup, it must include stimulus '{_settings.OneBackStimulus}'", App.Name, MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
         _logger.Reset();
         _logger.Add(LogSource.Experiment, LogAction.Start, CurrentSetup.Name);
 
@@ -70,6 +76,9 @@ internal class Procedure
         _targetIndexes = PrepareTargets(CurrentSetup);
 
         _trialIndex = -1;
+
+        _stopwatch.Reset();
+        _stopwatch.Start();
 
         Started?.Invoke(this, EventArgs.Empty);
         _player.PlayStartSound();
@@ -85,6 +94,7 @@ internal class Procedure
             return;
 
         _timer.Stop();
+        _stopwatch.Stop();
 
         UpdateState(State.Inactive);
 
@@ -95,7 +105,7 @@ internal class Procedure
     {
         bool wasActivated = true;
 
-        if (_settings.AllowMultipleActivations)
+        if (_settings.AllowMultipleActivations && !_settings.IsTrialInfinite)
         {
             CurrentSetup?.ResetStimuli();
         }
@@ -123,7 +133,7 @@ internal class Procedure
 
     public void DeactivateStimulus()
     {
-        if (_settings.ActivationInterruptsTrial)
+        if (_settings.ActivationInterruptsTrial || _settings.IsTrialInfinite)
         {
             _timer.Stop();
             UpdateState(State.Info);
@@ -172,6 +182,7 @@ internal class Procedure
     readonly string NET_COMMAND_EXIT = "exit";
 
     readonly System.Timers.Timer _timer = new();
+    readonly System.Diagnostics.Stopwatch _stopwatch = new();
     readonly Player _player = new();
     readonly Logger _logger = Logger.Instance;
     readonly Settings _settings = Settings.Instance;
@@ -230,20 +241,29 @@ internal class Procedure
 
         CurrentSetup.ResetStimuli();
 
-        if (++_trialIndex < _settings.TrialCount)
+        bool hasFinished = false;
+        if (_settings.SessionType == SessionType.Count)
+        {
+            hasFinished = ++_trialIndex >= _settings.TrialCount;
+        }
+        else if (_settings.SessionType == SessionType.Duration)
+        {
+            if (++_trialIndex == _targetIndexes.Length)
+            {
+                _targetIndexes = PrepareTargets(CurrentSetup);
+                _trialIndex = 0;
+            }
+            hasFinished = _stopwatch.Elapsed.TotalSeconds >= _settings.SessionDuration;
+        }
+
+        if (!hasFinished)
         {
             UpdateState(State.BlankScreen);
         }
         else
         {
             Stop(StopReason.Finished);
-
-            var filename = _logger.Save();
-            if (filename == null)
-            {
-                MessageBox.Show("Failed to save data!", App.Name, MessageBoxButton.OK, MessageBoxImage.Error);
-                //MessageBox.Show($"Data saved to '{filename}'", App.Name, MessageBoxButton.OK, MessageBoxImage.Information);
-            }
+            _logger.Save();
         }
     }
 
@@ -254,12 +274,18 @@ internal class Procedure
 
         _state = newState;
 
+        var stimulus = _settings.TaskType == TaskType.NBack ?
+            (_trialIndex < _targetIndexes.Length ? 
+                CurrentSetup.Stimuli[_targetIndexes[_trialIndex]] :
+                null
+            ) :
+            CurrentSetup.Stimuli.First(s => s.Text == _settings.OneBackStimulus);
+
         if (_state == State.BlankScreen)
         {
             _timer.Interval = Math.Max(1, _settings.BlankScreenDuration);
             _timer.Start();
 
-            var stimulus = CurrentSetup.Stimuli[_targetIndexes[_trialIndex]];
             _logger.Add(LogSource.Stimuli, LogAction.Target, stimulus?.Text ?? "?");
 
             if (_settings.InfoDuration == 0 && _settings.BlankScreenDuration > 0)
@@ -273,7 +299,6 @@ internal class Procedure
         {
             StimuliShown?.Invoke(this, EventArgs.Empty);
 
-            var stimulus = CurrentSetup.Stimuli[_targetIndexes[_trialIndex]];
             _logger.Add(LogSource.Stimuli, LogAction.Displayed, stimulus?.Text ?? "?");
 
             if (stimulus != null)
@@ -281,21 +306,24 @@ internal class Procedure
                 _server.Send($"SET {stimulus.Text}");
 
                 var sound = stimulus.AudioInstruction;
-                _player.Play(sound).Then(() =>
+                var soundPlayer = _player.Play(sound);
+
+                if (!_settings.IsTrialInfinite)
                 {
-                    _timer.Interval = _settings.StimulusDuration;
-                    _timer.Start();
-                });
+                    soundPlayer.Then(() =>
+                    {
+                        _timer.Interval = _settings.StimulusDuration;
+                        _timer.Start();
+                    });
+                }
             }
 
-            System.Diagnostics.Debug.WriteLine($"Trial stimulus: {CurrentSetup.Stimuli[_targetIndexes[_trialIndex]].Text}");
+            System.Diagnostics.Debug.WriteLine($"Trial stimulus: {stimulus?.Text}");
         }
         else if (_state == State.Info)
         {
             _timer.Interval = Math.Max(1, _settings.InfoDuration);
             _timer.Start();
-
-            var stimulus = CurrentSetup.Stimuli[_targetIndexes[_trialIndex]];
 
             bool isCorrect = stimulus?.WasActivated ?? false;
             _logger.Add(LogSource.Stimuli, LogAction.Hidden);
@@ -328,12 +356,17 @@ internal class Procedure
     private int[] PrepareTargets(Setup setup)
     {
         List<int> indexes = [];
-        while (indexes.Count < _settings.TrialCount)
+
+        int trialCount = _settings.SessionType == SessionType.Count
+            ? _settings.TrialCount
+            : setup.Stimuli.Length;
+
+        while (indexes.Count < trialCount)
         {
             indexes.AddRange(setup.Stimuli.Select((btn, i) => i));
         }
 
-        indexes.RemoveRange(_settings.TrialCount, indexes.Count - _settings.TrialCount);
+        indexes.RemoveRange(trialCount, indexes.Count - trialCount);
 
         Span<int> shuffledIndexes = indexes.ToArray();
         _random.Shuffle(shuffledIndexes);

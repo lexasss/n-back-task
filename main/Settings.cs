@@ -9,6 +9,18 @@ internal enum InputMode
     Touch
 }
 
+internal enum SessionType
+{
+    Count,
+    Duration
+}
+
+internal enum TaskType
+{
+    NBack,
+    OneBack
+}
+
 internal class Settings : INotifyPropertyChanged
 {
     public static Settings Instance => _instance ??= new();
@@ -27,6 +39,7 @@ internal class Settings : INotifyPropertyChanged
 
     public int BlankScreenDuration { get; set; } // ms
     public int StimulusDuration { get; set; }    // ms
+    public bool IsTrialInfinite { get; set; }
     public int InfoDuration { get; set; }        // ms
     public bool ActivationInterruptsTrial { get; set; }
     public bool AllowMultipleActivations { get; set; }
@@ -34,27 +47,47 @@ internal class Settings : INotifyPropertyChanged
     public bool PlaySoundOnActivation { get; set; }
 
     public InputMode InputMode { get; set; }
+    public SessionType SessionType
+    {
+        get => field;
+        set
+        {
+            field = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SessionType)));
+        }
+    } = SessionType.Count;
     public int TrialCount { get; set; }
+    public int SessionDuration { get; set; }  // seconds
+    public string OneBackStimulus { get; set; } // 0..9
+    public TaskType TaskType
+    {
+        get => field;
+        set
+        {
+            field = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TaskType)));
+        }
+    } = TaskType.NBack;
 
     public string LogFolder
     {
-        get => _logFolder;
+        get => field;
         set
         {
-            _logFolder = value;
+            field = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LogFolder)));
         }
-    }
+    } = "";
 
     public bool PlayBackgroundNoise
     {
-        get => _playBackgroundNoise;
+        get => field;
         set
         {
-            _playBackgroundNoise = value;
+            field = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PlayBackgroundNoise)));
         }
-    }
+    } = false;
 
     // Session-only
 
@@ -93,6 +126,7 @@ internal class Settings : INotifyPropertyChanged
 
         settings.BlankScreenDuration = BlankScreenDuration;
         settings.StimulusDuration = StimulusDuration;
+        settings.IsTrialInfinite = IsTrialInfinite;
         settings.InfoDuration = InfoDuration;
         settings.ActivationInterruptsTrial = ActivationInterruptsTrial;
         settings.AllowMultipleActivations = AllowMultipleActivations;
@@ -100,7 +134,11 @@ internal class Settings : INotifyPropertyChanged
         settings.PlaySoundOnActivation = PlaySoundOnActivation;
 
         settings.InputMode = (int)InputMode;
+        settings.SessionType = (int)SessionType;
         settings.TestCount = TrialCount;
+        settings.SessionDuration = SessionDuration;
+        settings.OneBackStimulus = OneBackStimulus;
+        settings.TaskType = (int)TaskType;
         settings.LogFolder = LogFolder;
 
         settings.PlayBackgroundNoise = PlayBackgroundNoise;
@@ -111,9 +149,6 @@ internal class Settings : INotifyPropertyChanged
     // Internal
 
     static Settings? _instance = null;
-
-    string _logFolder = "";
-    bool _playBackgroundNoise = false;
 
 #pragma warning disable CS8618
     private Settings()
@@ -138,6 +173,7 @@ internal class Settings : INotifyPropertyChanged
 
         BlankScreenDuration = settings.BlankScreenDuration;
         StimulusDuration = settings.StimulusDuration;
+        IsTrialInfinite = settings.IsTrialInfinite;
         InfoDuration = settings.InfoDuration;
         ActivationInterruptsTrial = settings.ActivationInterruptsTrial;
         AllowMultipleActivations = settings.AllowMultipleActivations;
@@ -145,7 +181,11 @@ internal class Settings : INotifyPropertyChanged
         PlaySoundOnActivation = settings.PlaySoundOnActivation;
 
         InputMode = (InputMode)settings.InputMode;
+        SessionType = (SessionType)settings.SessionType;
         TrialCount = settings.TestCount;
+        SessionDuration = settings.SessionDuration;
+        OneBackStimulus = settings.OneBackStimulus;
+        TaskType = (TaskType)settings.TaskType;
         LogFolder = settings.LogFolder;
 
         PlayBackgroundNoise = settings.PlayBackgroundNoise;

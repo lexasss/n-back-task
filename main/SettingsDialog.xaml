@@ -7,16 +7,24 @@
         xmlns:local="clr-namespace:NBackTask"
         mc:Ignorable="d"
         Title="Settings"
-        Height="398"
+        Height="518"
         Width="480"
         Icon="/assets/images/icon.png"
         ResizeMode="NoResize"
+        d:Height="520"
         WindowStartupLocation="CenterScreen">
-    
+
     <Window.Resources>
         <local:ColorBrushConverter x:Key="scb2brush"/>
         <local:NegateConverter x:Key="not"/>
         <local:PathUIConverter x:Key="pathUI"/>
+        <local:SessionTypeToVisibility x:Key="sessionType2Visibility"/>
+        <local:SessionTypeToEnabled x:Key="sessionType2Enabled"/>
+        <local:TaskTypeToEnabled x:Key="taskType2Enabled"/>
+        <local:SessionType x:Key="trialCount">Count</local:SessionType>
+        <local:SessionType x:Key="sessionDuration">Duration</local:SessionType>
+        <local:TaskType x:Key="nback">NBack</local:TaskType>
+        <local:TaskType x:Key="oneback">OneBack</local:TaskType>
 
         <ObjectDataProvider x:Key="inputModes" MethodName="GetValues"
                             ObjectType="{x:Type System:Enum}">
@@ -24,7 +32,19 @@
                 <x:Type TypeName="local:InputMode"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        
+        <ObjectDataProvider x:Key="sessionTypes" MethodName="GetValues"
+                            ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:SessionType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="taskTypes" MethodName="GetValues"
+                            ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:TaskType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
         <Style x:Key="CloseButton" TargetType="Button">
             <Setter Property="MinWidth" Value="60"/>
             <Setter Property="Margin" Value="4"/>
@@ -158,10 +178,71 @@
             </Grid>
 
         </StackPanel>
-        
+
         <StackPanel Grid.Row="0" Grid.Column="1"
                     Margin="12,4,4,4">
             <Label Style="{StaticResource Header}">Procedure</Label>
+            <Grid>
+                <Label>Session type</Label>
+                <ComboBox Width="80"
+                          HorizontalAlignment="Right"
+                          ItemsSource="{Binding Source={StaticResource sessionTypes}}"
+                          SelectedItem="{Binding Path=SessionType}"/>
+            </Grid>
+            <Grid Visibility="{Binding SessionType, Converter={StaticResource sessionType2Visibility}, ConverterParameter={StaticResource trialCount}}">
+                <Label Margin="16,0,0,0">number of trials</Label>
+                <TextBox x:Name="txbTrialCount">
+                    <TextBox.Text>
+                        <Binding Path="TrialCount" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <local:RangeRule Min="1" Max="1000" ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+            </Grid>
+            <Grid Visibility="{Binding SessionType, Converter={StaticResource sessionType2Visibility}, ConverterParameter={StaticResource sessionDuration}}">
+                <Label Margin="16,0,0,0">session duration (seconds)</Label>
+                <TextBox x:Name="txbSessionDuration">
+                    <TextBox.Text>
+                        <Binding Path="SessionDuration" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <local:RangeRule Min="5" Max="3600" ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+            </Grid>
+
+            <Grid>
+                <Label>Task type</Label>
+                <ComboBox Width="80"
+                          HorizontalAlignment="Right"
+                          ItemsSource="{Binding Source={StaticResource taskTypes}}"
+                          SelectedItem="{Binding Path=TaskType}"/>
+            </Grid>
+            <Grid IsEnabled="{Binding TaskType, Converter={StaticResource taskType2Enabled}, ConverterParameter={StaticResource oneback}}">
+                <Label Margin="16,0,0,0">target [0..9]</Label>
+                <TextBox x:Name="txbSingleStimulus">
+                    <TextBox.Text>
+                        <Binding Path="OneBackStimulus" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <local:RangeRule Min="0" Max="9" ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+            </Grid>
+            <Grid>
+                <Label>Input mode</Label>
+                <ComboBox Width="80"
+                          HorizontalAlignment="Right"
+                          ItemsSource="{Binding Source={StaticResource inputModes}}"
+                          SelectedItem="{Binding Path=InputMode}"/>
+            </Grid>
+
+            <Separator/>
+
             <Grid>
                 <Label>Blank screen duration, ms</Label>
                 <TextBox x:Name="txbBlankScreenDuration">
@@ -174,9 +255,16 @@
                     </TextBox.Text>
                 </TextBox>
             </Grid>
-            <Grid>
-                <Label>Stimulus duration, ms</Label>
-                <TextBox x:Name="txbStimulusDuration">
+            <CheckBox x:Name="chkIsInfiniteTrial"
+                      Content="Trials last until activation"
+                      IsChecked="{Binding IsTrialInfinite, Mode=TwoWay}"/>
+            <Grid IsEnabled="{Binding IsChecked, ElementName=chkIsInfiniteTrial, Converter={StaticResource not}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="23*"/>
+                    <ColumnDefinition Width="89*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.ColumnSpan="2">Stimulus duration, ms</Label>
+                <TextBox x:Name="txbStimulusDuration" Grid.Column="1" HorizontalAlignment="Left" Margin="130,2,0,2">
                     <TextBox.Text>
                         <Binding Path="StimulusDuration" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
                             <Binding.ValidationRules>
@@ -186,12 +274,14 @@
                     </TextBox.Text>
                 </TextBox>
             </Grid>
-            <CheckBox x:Name="chkActivationInterruptsTrial"
+            <StackPanel IsEnabled="{Binding IsChecked, ElementName=chkIsInfiniteTrial, Converter={StaticResource not}}">
+                <CheckBox x:Name="chkActivationInterruptsTrial"
                       Content="Activation interrupts a trial"
                       IsChecked="{Binding ActivationInterruptsTrial, Mode=TwoWay}"/>
-            <CheckBox Content="Allow multiple activations"
+                <CheckBox Content="Allow multiple activations"
                       IsChecked="{Binding AllowMultipleActivations, Mode=TwoWay}"
                       IsEnabled="{Binding IsChecked, ElementName=chkActivationInterruptsTrial, Converter={StaticResource not}}"/>
+            </StackPanel>
             <Grid>
                 <Label>Result display duration, ms</Label>
                 <TextBox x:Name="txbResultDisplayDuration">
@@ -199,28 +289,6 @@
                         <Binding Path="InfoDuration" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
                             <Binding.ValidationRules>
                                 <local:RangeRule Min="0" Max="10000" ValidatesOnTargetUpdated="True"/>
-                            </Binding.ValidationRules>
-                        </Binding>
-                    </TextBox.Text>
-                </TextBox>
-            </Grid>
-
-            <Separator/>
-
-            <Grid>
-                <Label>Input mode</Label>
-                <ComboBox Width="80"
-                          HorizontalAlignment="Right"
-                          ItemsSource="{Binding Source={StaticResource inputModes}}"
-                          SelectedItem="{Binding Path=InputMode}"/>
-            </Grid>
-            <Grid>
-                <Label>Number of trials</Label>
-                <TextBox x:Name="txbTrialCount">
-                    <TextBox.Text>
-                        <Binding Path="TrialCount" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
-                            <Binding.ValidationRules>
-                                <local:RangeRule Min="1" Max="1000" ValidatesOnTargetUpdated="True"/>
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox.Text>
@@ -260,7 +328,7 @@
                         Content="..."
                         Click="SelectFolder_Click"/>
             </Grid>
-            
+
             <WrapPanel HorizontalAlignment="Center"
                        Margin="0,8,0,0">
                 <Button Content="Save"
@@ -279,6 +347,7 @@
                                         <Condition Binding="{Binding ElementName=txbStimulusDuration, Path=(Validation.HasError)}" Value="False" />
                                         <Condition Binding="{Binding ElementName=txbResultDisplayDuration, Path=(Validation.HasError)}" Value="False" />
                                         <Condition Binding="{Binding ElementName=txbTrialCount, Path=(Validation.HasError)}" Value="False" />
+                                        <Condition Binding="{Binding ElementName=txbSessionDuration, Path=(Validation.HasError)}" Value="False" />
                                         <Condition Binding="{Binding ElementName=txbStimulusUnstretchedSize, Path=(Validation.HasError)}" Value="False" />
                                     </MultiDataTrigger.Conditions>
                                     <Setter Property="IsEnabled" Value="True" />
