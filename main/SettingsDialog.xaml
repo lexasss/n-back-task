@@ -421,8 +421,9 @@
                             </ContextMenu>
                         </Button.ContextMenu>
                     </Button>
-                    <Button Style="{StaticResource CloseButton}" Content="Cancel"
-                        IsCancel="True"/>
+                    <Button Style="{StaticResource CloseButton}"
+                            Content="Cancel"
+                            IsCancel="True"/>
                 </WrapPanel>
             </Grid>
         </StackPanel>

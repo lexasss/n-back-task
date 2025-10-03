@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Xml.Linq;
 
 namespace NBackTask;
 
@@ -95,20 +94,10 @@ public partial class SettingsDialog : Window, INotifyPropertyChanged
 
     private void Load_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new Microsoft.Win32.OpenFileDialog
+        var dialog = new Profiles();
+        if (dialog.ShowDialog() == true && !string.IsNullOrEmpty(dialog.SelectedProfile))
         {
-            DefaultDirectory = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tampere_University"),
-            DefaultExt = ".json",
-            Filter = "NBackTask settings JSON files|nbacktask-*.json" // Filter files by extension
-        };
-
-        bool? result = dialog.ShowDialog();
-        if (result == true)
-        {
-            string path = dialog.FileName;
-            var filename = System.IO.Path.GetFileNameWithoutExtension(path);
-            var p = filename.Split('-');
-            var name = string.Join('-', p.Skip(1)); // skip nbacktask-
+            var name = dialog.SelectedProfile;
 
             var settings = new Settings();
             if (settings.Load(name))

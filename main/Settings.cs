@@ -167,7 +167,7 @@ public class Settings : INotifyPropertyChanged
 
         try
         {
-            var filename = GetSettingsFileName(name);
+            var filename = GetProfileFilePath(name);
             var json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
             System.IO.File.WriteAllText(filename, json);
         }
@@ -226,7 +226,7 @@ public class Settings : INotifyPropertyChanged
 
         try
         {
-            var filename = GetSettingsFileName(name);
+            var filename = GetProfileFilePath(name);
             if (System.IO.File.Exists(filename))
             {
                 var json = System.IO.File.ReadAllText(filename);
@@ -264,6 +264,23 @@ public class Settings : INotifyPropertyChanged
         return false;
     }
 
+    public static string SettingsFolder =>
+        System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tampere_University");
+
+    public static string GetProfileFileName(string name, bool validate = true)
+    {
+        if (validate)
+            name = name.ToPath();
+        return $"nbacktask-{name}.json";
+    }
+
+    public static string GetProfileNameFromFileName(string filename)
+    {
+        var fn = System.IO.Path.GetFileNameWithoutExtension(filename);
+        var p = fn.Split('-');
+        return string.Join('-', p.Skip(1)); // skip nbacktask-
+    }
+
     // Internal
 
     static string? _loadingName = null;
@@ -285,9 +302,9 @@ public class Settings : INotifyPropertyChanged
             _loadingName = args[1];
     }
 
-    private static string GetSettingsFileName(string name)
+    private static string GetProfileFilePath(string name)
     {
-        return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tampere_University", $"nbacktask-{name.ToPath()}.json");
+        return System.IO.Path.Combine(SettingsFolder, GetProfileFileName(name));
     }
 
     private void Load()

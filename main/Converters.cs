@@ -65,3 +65,12 @@ public class TaskTypeToEnabled : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => TaskType.NBack;
 }
+
+
+[ValueConversion(typeof(object), typeof(bool))]
+public class ObjectToEnabled : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value != null;
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => TaskType.NBack;
+}
