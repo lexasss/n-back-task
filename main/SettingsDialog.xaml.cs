@@ -101,7 +101,9 @@ public partial class SettingsDialog : Window, INotifyPropertyChanged
 
             var settings = new Settings();
             if (settings.Load(name))
+            {
                 Settings = settings;
+            }
 
             Title = $"Settings - {Settings.Name}";
 

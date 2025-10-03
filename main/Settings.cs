@@ -237,6 +237,8 @@ public class Settings : INotifyPropertyChanged
 
                 if (result != null)
                 {
+                    result.SetupIndex = SetupIndex;
+
                     // copy all properties
                     foreach (var prop in typeof(Settings).GetProperties())
                     {
@@ -271,7 +273,7 @@ public class Settings : INotifyPropertyChanged
     {
         if (validate)
             name = name.ToPath();
-        return $"nbacktask-{name}.json";
+        return $"nbacktask-{name}.settings";
     }
 
     public static string GetProfileNameFromFileName(string filename)
