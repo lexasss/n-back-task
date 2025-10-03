@@ -1,38 +1,76 @@
 ﻿using System.ComponentModel;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Windows.Media;
 
 namespace NBackTask;
 
-internal enum InputMode
+public enum InputMode
 {
     Mouse,
     Touch
 }
 
-internal enum SessionType
+public enum SessionType
 {
     Count,
     Duration
 }
 
-internal enum TaskType
+public enum TaskType
 {
     NBack,
     OneBack
 }
 
-internal class Settings : INotifyPropertyChanged
+public class Settings : INotifyPropertyChanged
 {
-    public static Settings Instance => _instance ??= new();
+    public static Settings Instance { get => field ??= new(); } = null;
+
+    [JsonIgnore]
+    public string? Name { get; set; } = null;
 
     // Inter-session
 
+    [JsonIgnore]
     public SolidColorBrush ScreenColor { get; set; }
+    [JsonIgnore]
     public SolidColorBrush ActiveScreenColor { get; set; }
+    [JsonIgnore]
     public SolidColorBrush StimulusColor { get; set; }
+    [JsonIgnore]
     public SolidColorBrush StimulusFontColor { get; set; }
+    [JsonIgnore]
     public SolidColorBrush ActiveStimulusColor { get; set; }
+    [JsonIgnore]
     public SolidColorBrush ActiveStimulusFontColor { get; set; }
+
+    public string ScreenColorAsText
+    {
+        get => ScreenColor.Serialize();
+        set => ScreenColor = SolidColorBrushExt.Deserialize(value);
+    }
+    public string ActiveScreenColorAsText {
+        get => ActiveScreenColor.Serialize();
+        set => ActiveScreenColor = SolidColorBrushExt.Deserialize(value);
+    }
+    public string StimulusColorAsText
+    {
+        get => StimulusColor.Serialize();
+        set => StimulusColor = SolidColorBrushExt.Deserialize(value);
+    }
+    public string StimulusFontColorAsText {
+        get => StimulusFontColor.Serialize();
+        set => StimulusFontColor = SolidColorBrushExt.Deserialize(value);
+    }
+    public string ActiveStimulusColorAsText {
+        get => ActiveStimulusColor.Serialize();
+        set => ActiveStimulusColor = SolidColorBrushExt.Deserialize(value);
+    }
+    public string ActiveStimulusFontColorAsText {
+        get => ActiveStimulusFontColor.Serialize();
+        set => ActiveStimulusFontColor = SolidColorBrushExt.Deserialize(value);
+    }
 
     public int StimulusBorderThickness { get; set; }
     public double StimulusGap { get; set; }
@@ -103,23 +141,58 @@ internal class Settings : INotifyPropertyChanged
         var dialog = new SettingsDialog(modifiedSettings);
         if (dialog.ShowDialog() ?? false)
         {
+            modifiedSettings = dialog.Settings;
             modifiedSettings.Save();
 
-            Load();
+            if (!string.IsNullOrEmpty(modifiedSettings.Name))
+            {
+                if (Load(modifiedSettings.Name))
+                {
+                    _loadingName = modifiedSettings.Name;
+                }
+            }
+            else
+            {
+                Load();
+            }
+
             Updated?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    public void Save(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+            return;
+
+        try
+        {
+            var filename = GetSettingsFileName(name);
+            var json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
+            System.IO.File.WriteAllText(filename, json);
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"Failed to save settings '{name}': {ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
     }
 
     public void Save()
     {
+        if (!string.IsNullOrEmpty(Name))
+        {
+            Save(Name);
+            return;
+        }
+
         var settings = Properties.Settings.Default;
 
-        settings.ScreenColor = ScreenColor.Serialize();
-        settings.ActiveScreenColor = ActiveScreenColor.Serialize();
-        settings.StimulusColor = StimulusColor.Serialize();
-        settings.StimulusFontColor = StimulusFontColor.Serialize();
-        settings.ActiveStimulusColor = ActiveStimulusColor.Serialize();
-        settings.ActiveStimulusFontColor = ActiveStimulusFontColor.Serialize();
+        settings.ScreenColor = ScreenColorAsText;
+        settings.ActiveScreenColor = ActiveScreenColorAsText;
+        settings.StimulusColor = StimulusColorAsText;
+        settings.StimulusFontColor = StimulusFontColorAsText;
+        settings.ActiveStimulusColor = ActiveStimulusColorAsText;
+        settings.ActiveStimulusFontColor = ActiveStimulusFontColorAsText;
 
         settings.StimulusBorderThickness = StimulusBorderThickness;
         settings.StimulusGap = StimulusGap;
@@ -146,27 +219,90 @@ internal class Settings : INotifyPropertyChanged
         settings.Save();
     }
 
+    public bool Load(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+            return false;
+
+        try
+        {
+            var filename = GetSettingsFileName(name);
+            if (System.IO.File.Exists(filename))
+            {
+                var json = System.IO.File.ReadAllText(filename);
+
+                _isSerializing = true;
+                var result = JsonSerializer.Deserialize<Settings>(json);
+                _isSerializing = false;
+
+                if (result != null)
+                {
+                    // copy all properties
+                    foreach (var prop in typeof(Settings).GetProperties())
+                    {
+                        // skip ignored properties
+                        object[] attrs = prop.GetCustomAttributes(true);
+                        if (attrs.Any(attr => attr is JsonIgnoreAttribute))
+                            continue;
+
+                        if (prop.CanRead && prop.CanWrite)
+                        {
+                            var value = prop.GetValue(result);
+                            prop.SetValue(this, value);
+                        }
+                    }
+                    Name = name;
+                    return true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"Failed to save settings '{name}': {ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+        }
+
+        return false;
+    }
+
     // Internal
 
-    static Settings? _instance = null;
+    static string? _loadingName = null;
+    static bool _isSerializing = false;
 
 #pragma warning disable CS8618
-    private Settings()
+    // To be used only by serializer
+    public Settings()
     {
-        Load();
+        if (!_isSerializing)
+            Load();
     }
 #pragma warning restore CS8618
 
+    static Settings()
+    {
+        var args = Environment.GetCommandLineArgs();
+        if (args.Length > 1)
+            _loadingName = args[1];
+    }
+
+    private static string GetSettingsFileName(string name)
+    {
+        return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tampere_University", $"nbacktask-{name.ToPath()}.json");
+    }
+
     private void Load()
     {
+        if (!string.IsNullOrEmpty(_loadingName) && Load(_loadingName))
+            return;
+
         var settings = Properties.Settings.Default;
 
-        ScreenColor = SolidColorBrushExt.Deserialize(settings.ScreenColor);
-        ActiveScreenColor = SolidColorBrushExt.Deserialize(settings.ActiveScreenColor);
-        StimulusColor = SolidColorBrushExt.Deserialize(settings.StimulusColor);
-        StimulusFontColor = SolidColorBrushExt.Deserialize(settings.StimulusFontColor);
-        ActiveStimulusColor = SolidColorBrushExt.Deserialize(settings.ActiveStimulusColor);
-        ActiveStimulusFontColor = SolidColorBrushExt.Deserialize(settings.ActiveStimulusFontColor);
+        ScreenColorAsText = settings.ScreenColor;
+        ActiveScreenColorAsText = settings.ActiveScreenColor;
+        StimulusColorAsText = settings.StimulusColor;
+        StimulusFontColorAsText = settings.StimulusFontColor;
+        ActiveStimulusColorAsText = settings.ActiveStimulusColor;
+        ActiveStimulusFontColorAsText = settings.ActiveStimulusFontColor;
 
         StimulusBorderThickness = settings.StimulusBorderThickness;
         StimulusGap = settings.StimulusGap;

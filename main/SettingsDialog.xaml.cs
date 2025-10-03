@@ -1,24 +1,30 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 
 namespace NBackTask;
 
-public partial class SettingsDialog : Window
+public partial class SettingsDialog : Window, INotifyPropertyChanged
 {
+    public Settings Settings { get; private set; }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     internal SettingsDialog(Settings settings)
     {
         InitializeComponent();
 
-        _settings = settings;
+        Settings = settings;
+        if (!string.IsNullOrEmpty(Settings.Name))
+        {
+            Title += $" - {Settings.Name}";
+        }
 
         DataContext = settings;
     }
-
-    // Internal
-
-    readonly Settings _settings;
 
     // UI
 
@@ -50,15 +56,68 @@ public partial class SettingsDialog : Window
 
     private void SelectFolder_Click(object sender, RoutedEventArgs e)
     {
-        var folderName = Logger.SelectLogFolder(_settings.LogFolder);
+        var folderName = Logger.SelectLogFolder(Settings.LogFolder);
         if (folderName != null)
         {
-            _settings.LogFolder = folderName;
+            Settings.LogFolder = folderName;
         }
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         DialogResult = true;
+    }
+
+    private void Menu_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn)
+        {
+            var menu = ContextMenuService.GetContextMenu(btn);
+            if (menu?.IsOpen == false)
+            {
+                menu.HorizontalOffset = btn.ActualWidth + 5;
+                menu.VerticalOffset = btn.ActualHeight;
+                menu.PlacementTarget = btn;
+                menu.IsOpen = true;
+            }
+        }
+    }
+
+    private void SaveAs_Click(object sender, RoutedEventArgs e)
+    {
+        var profileName = InputDialog.ShowDialog("Enter the profile name:");
+        if (profileName != null)
+        {
+            Settings.Name = profileName;
+            DialogResult = true;
+        }
+    }
+
+    private void Load_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            DefaultDirectory = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tampere_University"),
+            DefaultExt = ".json",
+            Filter = "NBackTask settings JSON files|nbacktask-*.json" // Filter files by extension
+        };
+
+        bool? result = dialog.ShowDialog();
+        if (result == true)
+        {
+            string path = dialog.FileName;
+            var filename = System.IO.Path.GetFileNameWithoutExtension(path);
+            var p = filename.Split('-');
+            var name = string.Join('-', p.Skip(1)); // skip nbacktask-
+
+            var settings = new Settings();
+            if (settings.Load(name))
+                Settings = settings;
+
+            Title = $"Settings - {Settings.Name}";
+
+            DataContext = Settings;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DataContext)));
+        }
     }
 }

@@ -18,6 +18,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="assets\images\open-file.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Egorozh.ColorPicker.WPF.Dialog" Version="5.0.0" />
     <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
@@ -41,6 +45,7 @@
   <ItemGroup>
     <Resource Include="assets\images\delete.png" />
     <Resource Include="assets\images\icon.png" />
+    <Resource Include="assets\images\open-file.png" />
     <Resource Include="assets\images\tcp-no.png" />
     <Resource Include="assets\images\tcp-off.png" />
     <Resource Include="assets\images\tcp-on.png" />

@@ -86,6 +86,34 @@
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
+
+        <Style x:Key="CompactMenuItemStyle" TargetType="MenuItem">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border Name="Border"
+                                Background="Transparent"
+                                Padding="4,4">
+                            <ContentPresenter ContentSource="Header"
+                                              Margin="0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Center"
+                                              RecognizesAccessKey="True" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#FFDDDDDD"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#888"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -329,36 +357,74 @@
                         Click="SelectFolder_Click"/>
             </Grid>
 
-            <WrapPanel HorizontalAlignment="Center"
-                       Margin="0,8,0,0">
-                <Button Content="Save"
-                    IsDefault="True"
-                    Click="Save_Click">
-                    <Button.Style>
-                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CloseButton}">
-                            <Setter Property="IsEnabled" Value="false" />
-                            <Style.Triggers>
-                                <!-- Require the controls to be valid in order to press Save -->
-                                <MultiDataTrigger>
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding ElementName=txbStimulusBorder, Path=(Validation.HasError)}" Value="False" />
-                                        <Condition Binding="{Binding ElementName=txbStimulusGap, Path=(Validation.HasError)}" Value="False" />
-                                        <Condition Binding="{Binding ElementName=txbBlankScreenDuration, Path=(Validation.HasError)}" Value="False" />
-                                        <Condition Binding="{Binding ElementName=txbStimulusDuration, Path=(Validation.HasError)}" Value="False" />
-                                        <Condition Binding="{Binding ElementName=txbResultDisplayDuration, Path=(Validation.HasError)}" Value="False" />
-                                        <Condition Binding="{Binding ElementName=txbTrialCount, Path=(Validation.HasError)}" Value="False" />
-                                        <Condition Binding="{Binding ElementName=txbSessionDuration, Path=(Validation.HasError)}" Value="False" />
-                                        <Condition Binding="{Binding ElementName=txbStimulusUnstretchedSize, Path=(Validation.HasError)}" Value="False" />
-                                    </MultiDataTrigger.Conditions>
-                                    <Setter Property="IsEnabled" Value="True" />
-                                </MultiDataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
+            <Grid>
+                <Button Margin="6,4,4,0"
+                        Width="28"
+                        Height="28"
+                        Padding="4"
+                        HorizontalAlignment="Left"
+                        Click="Load_Click">
+                    <Image Source="/assets/images/open-file.png" Opacity="0.8"/>
                 </Button>
-                <Button Style="{StaticResource CloseButton}" Content="Cancel"
-                    IsCancel="True"/>
-            </WrapPanel>
+
+                <WrapPanel HorizontalAlignment="Center"
+                           Margin="0,8,0,0">
+                    <Button x:Name="btnSave"
+                            Content="Save"
+                            IsDefault="True"
+                            Margin="4,4,0,4"
+                            Click="Save_Click">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CloseButton}">
+                                <Setter Property="IsEnabled" Value="false" />
+                                <Style.Triggers>
+                                    <!-- Require the controls to be valid in order to press Save -->
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding ElementName=txbStimulusBorder, Path=(Validation.HasError)}" Value="False" />
+                                            <Condition Binding="{Binding ElementName=txbStimulusGap, Path=(Validation.HasError)}" Value="False" />
+                                            <Condition Binding="{Binding ElementName=txbBlankScreenDuration, Path=(Validation.HasError)}" Value="False" />
+                                            <Condition Binding="{Binding ElementName=txbStimulusDuration, Path=(Validation.HasError)}" Value="False" />
+                                            <Condition Binding="{Binding ElementName=txbResultDisplayDuration, Path=(Validation.HasError)}" Value="False" />
+                                            <Condition Binding="{Binding ElementName=txbTrialCount, Path=(Validation.HasError)}" Value="False" />
+                                            <Condition Binding="{Binding ElementName=txbSessionDuration, Path=(Validation.HasError)}" Value="False" />
+                                            <Condition Binding="{Binding ElementName=txbStimulusUnstretchedSize, Path=(Validation.HasError)}" Value="False" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="IsEnabled" Value="True" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button x:Name="btnMenu"
+                            Width="19"
+                            Margin="0,4,4,4"
+                            Content="⏷"
+                            IsEnabled="{Binding IsEnabled, ElementName=btnSave}"
+                            RenderTransformOrigin="0.5,0.5"
+                            Click="Menu_Click">
+                        <Button.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform X="-1"/>
+                            </TransformGroup>
+                        </Button.RenderTransform>
+                        <Button.ContextMenu>
+                            <ContextMenu Placement="Left">
+                                <MenuItem Style="{StaticResource CompactMenuItemStyle}"
+                                          Header="Save as..."
+                                          Width="70"
+                                          HorizontalContentAlignment="Left"
+                                          Click="SaveAs_Click"/>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+                    <Button Style="{StaticResource CloseButton}" Content="Cancel"
+                        IsCancel="True"/>
+                </WrapPanel>
+            </Grid>
         </StackPanel>
     </Grid>
 </Window>
