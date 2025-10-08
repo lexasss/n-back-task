@@ -305,16 +305,29 @@ internal class Procedure
             {
                 _server.Send($"SET {stimulus.Text}");
 
-                var sound = stimulus.AudioInstruction;
-                var soundPlayer = _player.Play(sound);
+                Sound? soundPlayer = null;
+
+                if (_settings.TaskType == TaskType.NBack)
+                {
+                    var sound = stimulus.AudioInstruction;
+                    soundPlayer = _player.Play(sound);
+                }
 
                 if (!_settings.IsTrialInfinite)
                 {
-                    soundPlayer.Then(() =>
+                    if (soundPlayer != null)
+                    {
+                        soundPlayer.Then(() =>
+                        {
+                            _timer.Interval = _settings.StimulusDuration;
+                            _timer.Start();
+                        });
+                    }
+                    else
                     {
                         _timer.Interval = _settings.StimulusDuration;
                         _timer.Start();
-                    });
+                    }
                 }
             }
 
