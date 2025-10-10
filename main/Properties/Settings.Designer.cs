@@ -290,12 +290,12 @@ namespace NBackTask.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("4")]
-        public string OneBackStimulus {
+        public string ZeroBackStimulus {
             get {
-                return ((string)(this["OneBackStimulus"]));
+                return ((string)(this["ZeroBackStimulus"]));
             }
             set {
-                this["OneBackStimulus"] = value;
+                this["ZeroBackStimulus"] = value;
             }
         }
         
@@ -313,13 +313,13 @@ namespace NBackTask.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool IsTrialInfinite {
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int TrialDurationType {
             get {
-                return ((bool)(this["IsTrialInfinite"]));
+                return ((int)(this["TrialDurationType"]));
             }
             set {
-                this["IsTrialInfinite"] = value;
+                this["TrialDurationType"] = value;
             }
         }
     }

@@ -20,7 +20,13 @@ public enum SessionType
 public enum TaskType
 {
     NBack,
-    OneBack
+    ZeroBack
+}
+
+public enum TrialDurationType
+{
+    Timed,
+    Infinite
 }
 
 public class Settings : INotifyPropertyChanged
@@ -77,7 +83,15 @@ public class Settings : INotifyPropertyChanged
 
     public int BlankScreenDuration { get; set; } // ms
     public int StimulusDuration { get; set; }    // ms
-    public bool IsTrialInfinite { get; set; }
+    public TrialDurationType TrialDurationType
+    {
+        get => field;
+        set
+        {
+            field = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TrialDurationType)));
+        }
+    }
     public int InfoDuration { get; set; }        // ms
     public bool ActivationInterruptsTrial { get; set; }
     public bool AllowMultipleActivations { get; set; }
@@ -96,7 +110,7 @@ public class Settings : INotifyPropertyChanged
     } = SessionType.Count;
     public int TrialCount { get; set; }
     public int SessionDuration { get; set; }  // seconds
-    public string OneBackStimulus { get; set; } // 0..9
+    public string ZeroBackStimulus { get; set; } // 0..9
     public TaskType TaskType
     {
         get => field;
@@ -199,7 +213,7 @@ public class Settings : INotifyPropertyChanged
 
         settings.BlankScreenDuration = BlankScreenDuration;
         settings.StimulusDuration = StimulusDuration;
-        settings.IsTrialInfinite = IsTrialInfinite;
+        settings.TrialDurationType = (int)TrialDurationType;
         settings.InfoDuration = InfoDuration;
         settings.ActivationInterruptsTrial = ActivationInterruptsTrial;
         settings.AllowMultipleActivations = AllowMultipleActivations;
@@ -210,7 +224,7 @@ public class Settings : INotifyPropertyChanged
         settings.SessionType = (int)SessionType;
         settings.TestCount = TrialCount;
         settings.SessionDuration = SessionDuration;
-        settings.OneBackStimulus = OneBackStimulus;
+        settings.ZeroBackStimulus = ZeroBackStimulus;
         settings.TaskType = (int)TaskType;
         settings.LogFolder = LogFolder;
 
@@ -328,7 +342,7 @@ public class Settings : INotifyPropertyChanged
 
         BlankScreenDuration = settings.BlankScreenDuration;
         StimulusDuration = settings.StimulusDuration;
-        IsTrialInfinite = settings.IsTrialInfinite;
+        TrialDurationType = (TrialDurationType)settings.TrialDurationType;
         InfoDuration = settings.InfoDuration;
         ActivationInterruptsTrial = settings.ActivationInterruptsTrial;
         AllowMultipleActivations = settings.AllowMultipleActivations;
@@ -339,7 +353,7 @@ public class Settings : INotifyPropertyChanged
         SessionType = (SessionType)settings.SessionType;
         TrialCount = settings.TestCount;
         SessionDuration = settings.SessionDuration;
-        OneBackStimulus = settings.OneBackStimulus;
+        ZeroBackStimulus = settings.ZeroBackStimulus;
         TaskType = (TaskType)settings.TaskType;
         LogFolder = settings.LogFolder;
 

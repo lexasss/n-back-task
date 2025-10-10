@@ -72,5 +72,13 @@ public class ObjectToEnabled : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value != null;
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => TaskType.NBack;
+    public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => null;
+}
+
+[ValueConversion(typeof(TrialDurationType), typeof(bool))]
+public class TrialDurationTypeToEnabled : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => (TrialDurationType)value == (TrialDurationType)parameter;
+
+    public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => null;
 }

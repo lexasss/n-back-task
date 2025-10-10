@@ -62,9 +62,9 @@ internal class Procedure
 
         CurrentSetup = _setups[setupIndex];
 
-        if (_settings.TaskType == TaskType.OneBack && CurrentSetup.Stimuli.FirstOrDefault(s => s.Text == _settings.OneBackStimulus) == null)
+        if (_settings.TaskType == TaskType.ZeroBack && CurrentSetup.Stimuli.FirstOrDefault(s => s.Text == _settings.ZeroBackStimulus) == null)
         {
-            MessageBox.Show($"Cannot run this setup, it must include stimulus '{_settings.OneBackStimulus}'", App.Name, MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Cannot run this setup, it must include stimulus '{_settings.ZeroBackStimulus}'", App.Name, MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
@@ -105,7 +105,7 @@ internal class Procedure
     {
         bool wasActivated = true;
 
-        if (_settings.AllowMultipleActivations && !_settings.IsTrialInfinite)
+        if (_settings.AllowMultipleActivations && _settings.TrialDurationType == TrialDurationType.Timed)
         {
             CurrentSetup?.ResetStimuli();
         }
@@ -133,7 +133,7 @@ internal class Procedure
 
     public void DeactivateStimulus()
     {
-        if (_settings.ActivationInterruptsTrial || _settings.IsTrialInfinite)
+        if (_settings.ActivationInterruptsTrial || _settings.TrialDurationType == TrialDurationType.Infinite)
         {
             _timer.Stop();
             UpdateState(State.Info);
@@ -279,7 +279,7 @@ internal class Procedure
                 CurrentSetup.Stimuli[_targetIndexes[_trialIndex]] :
                 null
             ) :
-            CurrentSetup.Stimuli.First(s => s.Text == _settings.OneBackStimulus);
+            CurrentSetup.Stimuli.First(s => s.Text == _settings.ZeroBackStimulus);
 
         if (_state == State.BlankScreen)
         {
@@ -313,7 +313,7 @@ internal class Procedure
                     soundPlayer = _player.Play(sound);
                 }
 
-                if (!_settings.IsTrialInfinite)
+                if (_settings.TrialDurationType == TrialDurationType.Timed)
                 {
                     if (soundPlayer != null)
                     {
