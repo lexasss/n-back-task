@@ -178,6 +178,7 @@ internal class Procedure
 
     readonly string NET_COMMAND_START = "start";
     readonly string NET_COMMAND_STOP = "stop";
+    readonly string NET_COMMAND_GET_TASKS = "get";
     readonly string NET_COMMAND_SET_TASK = "set";
     readonly string NET_COMMAND_EXIT = "exit";
 
@@ -412,6 +413,11 @@ internal class Procedure
         {
             if (IsRunning)
                 Stop();
+        }
+        else if (e.Equals(NET_COMMAND_GET_TASKS, _stringComparison))
+        {
+            var response = _setups.Select((setup, index) => $"{setup.Stimuli.Length},{setup.StimuliOrder}").ToList();
+            _server.Send($"TSK {string.Join(';', response)}");
         }
         else if (e.StartsWith(NET_COMMAND_SET_TASK, _stringComparison))
         {
