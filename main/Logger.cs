@@ -105,6 +105,26 @@ internal class Logger
         return null;
     }
 
+    public static string ReadSummaryFromFile(string filename)
+    {
+        using var reader = new StreamReader(filename);
+        string? line;
+        bool isSummarySection = false;
+        List<string> summary = [];
+        while ((line = reader.ReadLine()) != null)
+        {
+            if (isSummarySection)
+            {
+                summary.Add(line);
+            }
+            else if (line.StartsWith("#"))
+            {
+                isSummarySection = true;
+            }
+        }
+        return string.Join(Environment.NewLine, summary);
+    }
+
     // Internal
 
     protected Logger() { }

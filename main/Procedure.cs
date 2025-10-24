@@ -1,6 +1,8 @@
-﻿using System.Media;
+﻿using System.IO;
+using System.Media;
 using System.Text.Json;
 using System.Windows;
+using System.Xml.Linq;
 
 namespace NBackTask;
 
@@ -178,8 +180,10 @@ internal class Procedure
 
     readonly string NET_COMMAND_START = "start";
     readonly string NET_COMMAND_STOP = "stop";
-    readonly string NET_COMMAND_GET_TASKS = "get";
-    readonly string NET_COMMAND_SET_TASK = "set";
+    readonly string NET_COMMAND_SET_PROFILE = "profile";
+    readonly string NET_COMMAND_GET_TASKS = "tasks";
+    readonly string NET_COMMAND_SET_TASK = "task";
+    readonly string NET_COMMAND_GET_LOG = "getlog";
     readonly string NET_COMMAND_EXIT = "exit";
 
     readonly System.Timers.Timer _timer = new();
@@ -198,6 +202,8 @@ internal class Procedure
     State _state = State.Inactive;
     int[] _targetIndexes = [];
     int _trialIndex = -1;
+
+    string? _lastLogFilename = null;
 
     private List<Setup> LoadSetups()
     {
@@ -264,7 +270,7 @@ internal class Procedure
         else
         {
             Stop(StopReason.Finished);
-            _logger.Save();
+            _lastLogFilename = _logger.Save();
         }
     }
 
@@ -414,6 +420,11 @@ internal class Procedure
             if (IsRunning)
                 Stop();
         }
+        else if (e.StartsWith(NET_COMMAND_SET_PROFILE, _stringComparison))
+        {
+            var profile = e.Substring(NET_COMMAND_SET_PROFILE.Length).Trim();
+            _settings.Load(profile);
+        }
         else if (e.Equals(NET_COMMAND_GET_TASKS, _stringComparison))
         {
             var response = _setups.Select((setup, index) => $"{setup.Stimuli.Length},{setup.StimuliOrder}").ToList();
@@ -425,6 +436,17 @@ internal class Procedure
                 setupIndex >= 0 && setupIndex < _setups.Count)
             {
                 SetupRequested?.Invoke(this, setupIndex);
+            }
+        }
+        else if (e.Equals(NET_COMMAND_GET_LOG, _stringComparison))
+        {
+            if (string.IsNullOrEmpty(_lastLogFilename) || !File.Exists(_lastLogFilename))
+            {
+                _server.Send("LOG");
+            }
+            else
+            {
+                _server.Send($"LOG{Logger.ReadSummaryFromFile(_lastLogFilename)}");
             }
         }
         else if (e.Equals(NET_COMMAND_EXIT, _stringComparison))

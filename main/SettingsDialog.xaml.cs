@@ -97,10 +97,10 @@ public partial class SettingsDialog : Window, INotifyPropertyChanged
         var dialog = new Profiles();
         if (dialog.ShowDialog() == true && !string.IsNullOrEmpty(dialog.SelectedProfile))
         {
-            var name = dialog.SelectedProfile;
+            var profile = dialog.SelectedProfile;
 
             var settings = new Settings();
-            if (settings.Load(name))
+            if (settings.Load(profile))
             {
                 Settings = settings;
             }

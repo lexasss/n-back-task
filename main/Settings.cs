@@ -160,10 +160,7 @@ public class Settings : INotifyPropertyChanged
 
             if (!string.IsNullOrEmpty(modifiedSettings.Name))
             {
-                if (Load(modifiedSettings.Name))
-                {
-                    _loadingName = modifiedSettings.Name;
-                }
+                Load(modifiedSettings.Name);
             }
             else
             {
@@ -267,7 +264,10 @@ public class Settings : INotifyPropertyChanged
                             prop.SetValue(this, value);
                         }
                     }
+
                     Name = name;
+                    _loadingName = name;
+
                     return true;
                 }
             }
