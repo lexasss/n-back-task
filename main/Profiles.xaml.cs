@@ -13,10 +13,19 @@ public partial class Profiles : Window
     {
         InitializeComponent();
 
-        var filenames = Directory.GetFiles(Settings.SettingsFolder, Settings.GetProfileFileName("*", validate: false));
-        foreach (var filename in filenames)
-            Items.Add(Settings.GetProfileNameFromFileName(filename));
+        foreach (var profile in GetProfileNames())
+            Items.Add(profile);
     }
+
+    public static string[] GetProfileNames()
+    {
+        return Directory
+            .GetFiles(Settings.SettingsFolder, Settings.GetProfileFileName("*", validate: false))
+            .Select(Settings.GetProfileNameFromFileName)
+            .ToArray();
+    }
+
+    // Internal
 
     private void Load_Click(object sender, RoutedEventArgs e)
     {

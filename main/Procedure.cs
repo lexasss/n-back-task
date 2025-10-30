@@ -180,6 +180,7 @@ internal class Procedure
 
     readonly string NET_COMMAND_START = "start";
     readonly string NET_COMMAND_STOP = "stop";
+    readonly string NET_COMMAND_GET_PROFILES = "profiles";
     readonly string NET_COMMAND_SET_PROFILE = "profile";
     readonly string NET_COMMAND_GET_TASKS = "tasks";
     readonly string NET_COMMAND_SET_TASK = "task";
@@ -419,6 +420,11 @@ internal class Procedure
         {
             if (IsRunning)
                 Stop();
+        }
+        else if (e.Equals(NET_COMMAND_GET_PROFILES, _stringComparison))
+        {
+            var profiles = Profiles.GetProfileNames();
+            _server.Send($"PRO {string.Join(';', profiles)}");
         }
         else if (e.StartsWith(NET_COMMAND_SET_PROFILE, _stringComparison))
         {
